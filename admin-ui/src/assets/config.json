@@ -1,9 +1,11 @@
 {
     "primaryLangCode": "eng",
     "secondaryLangCode": "ara",
-    "baseUrl": "https://dev.mosip.net/v1/",
+    "baseUrl": "https://dev2.mosip.net/v1/",
+    "envUrl":"https://dev2.mosip.net/",
     "adminUrl":"/admin-ui/",
     "validateToken": "authmanager/authorize/admin/validateToken",
     "login": "admin/login/",
-    "logout": "admin/logout/user"
+    "logout": "admin/logout/user",
+    "keyCloakUrl":"keycloak/auth/admin/master/console/#/realms/mosip/users"
 } 
