@@ -2,6 +2,7 @@ import * as config from 'src/assets/config.json';
 export const AUTH_ERROR_CODE = ['KER-ATH-007','KER-ATH-006'];
 export const VERSION = '1.0';
 export const BASE_URL = config.baseUrl;
+export const KEYCLOACK_URL = config.envUrl + config.keyCloakUrl;
 export const IDS = 'dummy';
 export const URL = {
   centers: `masterdata/registrationcenters/search`,
