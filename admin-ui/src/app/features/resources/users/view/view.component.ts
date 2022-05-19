@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AuditService } from 'src/app/core/services/audit.service';
 import { TranslateService } from '@ngx-translate/core';
 import { AppConfigService } from 'src/app/app-config.service';
+import { BASE_URL } from 'src/app/app.constants';
 
 @Component({
   selector: 'app-view',
@@ -9,8 +10,11 @@ import { AppConfigService } from 'src/app/app-config.service';
   styleUrls: ['./view.component.scss']
 })
 export class ViewComponent implements OnInit {
+
+  private BASE_URL = this.appService.getConfig().baseUrl;
+  private ENV_URL = BASE_URL.substring(0,BASE_URL.length-3);
   keycloakUrl =
-    'https://mosipkeycloak.southindia.cloudapp.azure.com/auth/admin/master/console/#/realms/mosip/users';
+    this.ENV_URL+'keycloak/auth/admin/master/console/#/realms/mosip/users';
 
   constructor(
     private auditService: AuditService,
