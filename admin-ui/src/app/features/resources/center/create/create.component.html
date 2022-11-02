@@ -210,8 +210,8 @@
               <mat-form-field *ngFor="let fieldName of locationFieldNameList; let i = index; let odd = odd" [ngClass]="odd ? 'right-sizing-container' : 'left-sizing-container'">
                 <mat-label>{{ fieldName }}</mat-label>
                 <mat-select [value]="dynamicFieldValue[fieldName]" id="fieldName" (selectionChange)="
-                    loadLocationDataDynamically($event, i);
-                  ">
+                    loadLocationDataDynamically($event, i);" required
+                  >
                   <mat-option *ngFor="let data of dynamicDropDown[fieldName]" [value]="data.code">
                     {{ data.name }}
                   </mat-option>
