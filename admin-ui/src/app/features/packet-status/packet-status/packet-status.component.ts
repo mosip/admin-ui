@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { AppConfigService } from 'src/app/app-config.service';
-import { AuditService } from 'src/app/core/services/audit.service';
-import { DataStorageService } from 'src/app/core/services/data-storage.service';
-import { MatDialog } from '@angular/material/dialog';
-import { HeaderService } from 'src/app/core/services/header.service';
+import { Component, OnInit } from "@angular/core";
+import { TranslateService } from "@ngx-translate/core";
+import { AppConfigService } from "src/app/app-config.service";
+import { AuditService } from "src/app/core/services/audit.service";
+import { DataStorageService } from "src/app/core/services/data-storage.service";
+import { MatDialog } from "@angular/material/dialog";
+import { HeaderService } from "src/app/core/services/header.service";
 
 @Component({
-  selector: 'app-packet-status',
-  templateUrl: './packet-status.component.html',
-  styleUrls: ['./packet-status.component.scss']
+  selector: "app-packet-status",
+  templateUrl: "./packet-status.component.html",
+  styleUrls: ["./packet-status.component.scss"],
 })
 export class PacketStatusComponent implements OnInit {
   data = [
@@ -25,12 +25,12 @@ export class PacketStatusComponent implements OnInit {
   showTimeline = false;
   messages: any;
   statusCheck: string;
-  serverMessage:any;
-  languageCode:any;
+  serverMessage: any;
+  languageCode: any;
 
-  id = '';
+  id = "";
   error = false;
-  errorMessage = '';
+  errorMessage = "";
   constructor(
     private translate: TranslateService,
     private appService: AppConfigService,
@@ -42,48 +42,51 @@ export class PacketStatusComponent implements OnInit {
     this.languageCode = this.headerService.getUserPreferredLanguage();
     translate.use(this.headerService.getUserPreferredLanguage());
     this.translate
-    .getTranslation(this.headerService.getUserPreferredLanguage())
-    .subscribe(response => {
-      console.log(response);
-      this.messages = response['packet-status'];
-      this.serverMessage = response['serverError'];
-    });
+      .getTranslation(this.headerService.getUserPreferredLanguage())
+      .subscribe((response) => {
+        console.log(response);
+        this.messages = response["packet-status"];
+        this.serverMessage = response["serverError"];
+      });
   }
 
   ngOnInit() {
-    this.auditService.audit(5, 'ADM-045');
+    this.auditService.audit(5, "ADM-045");
   }
 
   search() {
     this.data = null;
-    this.errorMessage = '';
+    this.errorMessage = "";
     if (this.id.length == 0) {
       this.error = true;
     } else {
       this.error = false;
-      this.dataStorageService.getPacketStatus(this.id, this.headerService.getUserPreferredLanguage()).subscribe(response => {
-        if (response['errors']) {
-          this.error = true;
-          this.statusCheck = '';
-          this.errorMessage = this.serverMessage[response['errors'][0].errorCode];
-       } else{          
-          this.data = response['response']['packetStatusUpdateList'];
-          for (let i = 0 ; i < this.data.length; i++) {
-            if (this.data[i].statusCode.includes('FAILED')) {
-              this.statusCheck = this.messages.statuscheckFailed;
-              break;
-            } else {
-              this.statusCheck = this.messages.statuscheckCompleted;
+      this.dataStorageService
+        .getPacketStatus(this.id, this.headerService.getUserPreferredLanguage())
+        .subscribe((response) => {
+          if (response["errors"]) {
+            this.error = true;
+            this.statusCheck = "";
+            this.errorMessage =
+              this.serverMessage[response["errors"][0].errorCode];
+          } else {
+            this.data = response["response"]["packetStatusUpdateList"];
+            for (let i = 0; i < this.data.length; i++) {
+              if (this.data[i].statusCode.includes("FAILED")) {
+                this.statusCheck = this.messages.statuscheckFailed;
+                break;
+              } else {
+                this.statusCheck = this.messages.statuscheckCompleted;
+              }
+              this.error = false;
+              this.showDetails = true;
             }
-            this.error = false;
-            this.showDetails = true;
           }
-        }
-      });
+        });
     }
   }
 
-viewMore() {
+  viewMore() {
     this.showTimeline = !this.showTimeline;
   }
 }

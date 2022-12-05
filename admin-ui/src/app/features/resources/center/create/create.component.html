@@ -329,7 +329,6 @@
             <mat-form-field>
               <mat-label>{{ "center.holiday-zone" | translate }}</mat-label>
               <mat-select formControlName="holidayZone" id="holidayZone" required>
-                <!-- <input placeholder="Search..." matInput type="text" (keyup)="onKey($event.target.value, 'holiday')" class="example-input"> -->
                 <mat-option *ngFor="let data of dropDownValues.holidayZone.primary" [value]="data.fieldCode">
                   {{ data.fieldValue }}
                 </mat-option>

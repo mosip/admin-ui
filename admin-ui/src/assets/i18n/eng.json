@@ -38,7 +38,9 @@
         }
     },
     "dashboard": {
-        "welcomeMessage":"Welcome to Mosip Admin portal !"
+      "welcomeMessage": "THE REPUBLIC OF UGANDA",
+      "detailedMessage1": "NATIONAL IDENTIFICATION & REGISTRATION AUTHORITY",
+      "detailedMessage2": "ADMINISTRATOR PORTAL"
     },
     "center": {
         "title":"Centers",

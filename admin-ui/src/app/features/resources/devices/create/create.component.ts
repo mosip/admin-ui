@@ -81,8 +81,6 @@ export class CreateComponent{
   holidayDate: any;
   minDate = new Date();
   localeDtFormat = "";
-  searchResult:any;
-
   constructor(
     private location: Location,
     private formBuilder: FormBuilder,
@@ -162,11 +160,11 @@ export class CreateComponent{
         this.getData(params);
       } else {
         this.disableForms = false;
-        this.auditService.audit(21, 'ADM-130','device');
+        this.auditService.audit(20, 'ADM-130');
         this.initializeheader();
       }
     });
-    this.getDevicespecifications("");
+    this.getDevicespecifications();
     this.getSubZoneData();
     this.initializePrimaryForm();
     //this.getCenterDetails();  
@@ -226,30 +224,20 @@ export class CreateComponent{
       .subscribe(response => {           
         if(!response.errors){
           this.dropDownValues.regCenterCode.primary = response.response.registrationCenters;
-          if(this.data[0].regCenterId){
-            this.primaryForm.controls.regCenterId.setValue(this.data[0].regCenterId);
-          }          
         }else{
           this.dropDownValues.regCenterCode.primary = [];
         }     
       });
   }
 
-  getDevicespecifications(filterValue) {
-    let filterObject = new FilterValuesModel('name', 'unique', '');
+  getDevicespecifications() {
+    const filterObject = new FilterValuesModel('name', 'unique', '');
     let optinalFilterObject = new OptionalFilterValuesModel('isActive', 'equals', 'true');
-    let filterValueObject = {};
-    let optinalFilterArray = [];
-    optinalFilterArray.push(optinalFilterObject);
-    if(filterValue)
-      filterValueObject = {"columnName":"name","type":"contains","value":filterValue}
-      optinalFilterArray.push(filterValueObject);      
-    let filterRequest = new FilterRequest([filterObject], this.primaryLang, optinalFilterArray);
+    let filterRequest = new FilterRequest([filterObject], this.primaryLang, [optinalFilterObject]);
     let request = new RequestModel('', null, filterRequest);
     this.dataStorageService
       .getFiltersForAllMaterDataTypes('devicespecifications', request)
       .subscribe(response => {
-        this.searchResult = response.response.filters;
         this.dropDownValues.deviceTypeCode.primary = response.response.filters;
       });
   }
@@ -267,15 +255,6 @@ export class CreateComponent{
           this.primaryForm.controls.zone.disable();
         }        
       });
-  }
-
-  onKey(value) {     
-    this.searchResult = this.search(value);
-  }
-
-  search(value: string) { 
-    let filter = value.toLowerCase();
-    this.getDevicespecifications(value);
   }
 
   initializeheader() {
@@ -537,6 +516,7 @@ export class CreateComponent{
     this.primaryForm.controls.serialNumber.setValue(this.data[0].serialNum);
     this.primaryForm.controls.ipAddress.setValue(this.data[0].ipAddress);
     this.primaryForm.controls.deviceSpecId.setValue(this.data[0].deviceSpecId);
+    this.primaryForm.controls.regCenterId.setValue(this.data[0].regCenterId);
     this.primaryForm.controls.id.setValue(this.data[0].id);
   }
 
