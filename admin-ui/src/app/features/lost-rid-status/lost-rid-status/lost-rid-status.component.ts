@@ -15,6 +15,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { DialogComponent } from 'src/app/shared/dialog/dialog.component';
 import { AuditService } from 'src/app/core/services/audit.service';
 import { HeaderService } from 'src/app/core/services/header.service';
+import * as config from 'src/assets/config.json';
 
 @Component({
   selector: 'app-lost-rid-status',
@@ -236,15 +237,24 @@ export class LostRidStatusComponent implements OnInit {
   }
 
   getlostridDetails() {
+    const maxCount: number = parseInt(config["max-registration-date-filter-interval"], 10);
     let filter = [];
     for(let value of this.filterColumns) {
       if(this.fieldNameList[value.filtername]){
         if(value.dropdown !== 'true' && value.datePicker !== 'true'){
           filter.push({"columnName": value.fieldName,"type": "contains","value": this.fieldNameList[value.filtername]});
-        }else if(value.datePicker === 'true' && value.filterType === 'between'){
+        }else if(value.datePicker === 'true'){
           if(filter.length > 0)
             filter.splice(0,1);
-          filter.push({"columnName": value.fieldName,"type": "between","value": "", "fromValue": this.fieldNameList["registrationDateFrom"], "toValue":this.fieldNameList["registrationDateTo"]});
+            const fromDate = new Date(this.fieldNameList["registrationDateFrom"]);
+            const toDate = new Date(this.fieldNameList["registrationDateTo"]);
+            const dateDifference = toDate.getTime()-fromDate.getTime();
+            const differenceDays = dateDifference / (1000 * 60 * 60 * 24);
+            if (differenceDays > maxCount) {
+              const errorMessage = `Searching between date should be less than ${maxCount} days.`;
+              this.showErrorPopup(errorMessage);
+              return;
+            }
         }else if(value.dropdown === 'true'){
           filter.push({"columnName": value.fieldName,"type": "equals","value": this.fieldNameList[value.filtername]});
         }

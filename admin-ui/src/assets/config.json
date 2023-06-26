@@ -6,5 +6,6 @@
     "templateRepoUrl":"/admin-ui/templates/",
     "validateToken": "admin/authorize/admin/validateToken",
     "login": "admin/login/",
-    "logout": "admin/logout/user"
+    "logout": "admin/logout/user",
+    "max-registration-date-filter-interval": "25"
 } 
