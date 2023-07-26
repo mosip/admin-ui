@@ -1,5 +1,4 @@
-
-FROM openjdk:11
+FROM openjdk:11-jre
 
 ARG SOURCE
 ARG COMMIT_HASH
@@ -22,34 +21,27 @@ ARG container_user_uid=1001
 # can be passed during Docker build as build time environment for github branch to pickup configuration from.
 ARG container_user_gid=1001
 
-# install packages and create user
-RUN apt-get -y update \
-&& apt-get install -y unzip \
-&& groupadd -g ${container_user_gid} ${container_user_group} \
-&& useradd -u ${container_user_uid} -g ${container_user_group} -s /bin/sh -m ${container_user}
-
 # set working directory for the user
-WORKDIR /home/${container_user}
+ENV work_dir=/home/${container_user}/
 
-ENV work_dir=/home/${container_user}
+# install packages and create user
+RUN groupadd -g ${container_user_gid} ${container_user_group} \
+    && useradd -u ${container_user_uid} -g ${container_user_group} -s /bin/bash -m ${container_user} -d ${work_dir}
 
-ADD ./target/ $work_dir
-
-ADD entrypoint.sh $work_dir/entrypoint.sh
-
-RUN chmod +x $work_dir/entrypoint.sh
-
-RUN chown -R ${container_user}:${container_user} /home/${container_user} /usr/local/openjdk-11/lib/security/cacerts
-
-RUN chmod 644 /usr/local/openjdk-11/lib/security/cacerts
-
+# select container user for all tasks
 USER ${container_user_uid}:${container_user_gid}
 
-EXPOSE 8083
+COPY --chown=${container_user_uid}:${container_user} --chmod=771 ./entrypoint.sh ${work_dir}/entrypoint.sh
+COPY --chown=${container_user}:${container_user} ./build_files/ ${work_dir}
+COPY --chown=${container_user}:${container_user} ./profile_resource /tmp/profile_resource
 
-ENV MODULES=
-ENV ENV_USER=
-ENV ENV_ENDPOINT=
-ENV ENV_TESTLEVEL=smokeAndRegression
+# set environmental variables
+ENV mountPath=/home//${container_user}/mountvolume
+ENV authCertsPath=/home/${container_user}/authcerts
 
-ENTRYPOINT ["./entrypoint.sh"]
+# set working directory
+WORKDIR ${work_dir}
+
+EXPOSE 8080
+
+ENTRYPOINT ["/bin/bash", "-c", "./entrypoint.sh"]

@@ -1,4 +1,3 @@
-
 name: Maven Package upon a push
 
 on:
@@ -6,32 +5,26 @@ on:
     branches:
       - '!release-branch'
       - release-1*
-      - master
-      - 1.0.*
+      - '!master'
+      - 1.*
       - develop
-      - 1.1.*
-      - MOSIP-11719
-      - 1.2.*
+      - MOSIP*
 
 jobs:
-  build-admin-ui:
+  maven-build-admintest:
     runs-on: ubuntu-latest
     env:
-      NAMESPACE: ${{ secrets. dev_namespace_docker_hub }}
-      SERVICE_NAME: admin-ui
-      SERVICE_LOCATION: admin-ui
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+      SERVICE_LOCATION: ./admintest
+      CONFIG_LOCATION: 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-
-      - name: npm install
-        run: cd ${{ env.SERVICE_LOCATION }} && npm install --ignore-scripts
-
-      - name: npm build
-        run: cd ${{ env.SERVICE_LOCATION }} && npm run-script build -- --prod --base-href . --output-path=dist
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          ref: ${{ github.ref }}
+          java-version: 11
+          server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
+          settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: Setup branch and env
         run: |
@@ -39,19 +32,101 @@ jobs:
           echo "BRANCH_NAME=$(echo ${{ github.ref }} | sed -e 's,.*/\(.*\),\1,')" >> $GITHUB_ENV
           echo "GPG_TTY=$(tty)" >> $GITHUB_ENV
 
-      - name: setup environment
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-${{ env.BRANCH_NAME }}
+
+      - name: Install xmllint
+        run: |
+          sudo apt-get update
+          sudo apt-get install libxml2-utils
+
+      - name: Setup the settings file for ossrh server
+        run: echo "<settings>   <servers>    <server>       <id>ossrh</id>     </server>    </servers>   <profiles>     <profile>       <id>ossrh</id>       <activation>         <activeByDefault>true</activeByDefault>       </activation>         </profile>   <profile>      <id>allow-snapshots</id>         <activation><activeByDefault>true</activeByDefault></activation>      <repositories>        <repository>          <id>snapshots-repo</id>          <url>https://oss.sonatype.org/content/repositories/snapshots</url>          <releases><enabled>false</enabled></releases>          <snapshots><enabled>true</enabled></snapshots>        </repository>          <repository>          <id>releases-repo</id>          <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>          <releases><enabled>false</enabled></releases>          <snapshots><enabled>false</enabled></snapshots>        </repository>       </repositories>    </profile>    </profiles> </settings> " > $GITHUB_WORKSPACE/settings.xml
+
+      - name: Build mosip-packet-creator with Maven
+        run: |
+          cd ./${{env.SERVICE_LOCATION}}
+          mvn clean install -s $GITHUB_WORKSPACE/settings.xml
+
+      - name: Ready the springboot artifacts
+        run: |
+          cd ./${{env.SERVICE_LOCATION}}
+          mkdir -p build_files/config
+          cp $( find -name 'dslrig-packetcreator-*.jar' -type f ) build_files
+          cp -r ${{env.CONFIG_LOCATION}}/Biometric\ Devices build_files/Biometric\ Devices
+          #cp -r ${{env.CONFIG_LOCATION}}/config build_files/config
+          cp -r src/main/resources/application.properties build_files/config/
+          cp -r ${{env.CONFIG_LOCATION}}/resource build_files/resource
+          cp -r ${{env.CONFIG_LOCATION}}/application.properties build_files/application.properties
+          cp -r ./src/main/resources/dockersupport/centralized/mountvolume/profile_resource ./profile_resource
+          zip -r release.zip build_files/* profile_resource
+
+      - name: Upload the springboot jars
+        uses: actions/upload-artifact@v1
+        with:
+          name: release
+          path: ./${{env.SERVICE_LOCATION}}/release.zip
+
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,workflow,job # selectable (default: repo,message)
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }} # required
+        if: failure() # Pick up events even if the job fails or is canceled.
+
+  docker-build-admintest:
+    needs: maven-build-admintest
+    runs-on: ubuntu-latest
+    env:
+      NAMESPACE: ${{ secrets.dev_namespace_docker_hub }}
+      SERVICE_NAME: admintest
+      SERVICE_LOCATION: ./admintest
+      DOCKER_BUILDKIT: 1
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v1
+        with:
+          name: release
+          path: ./${{env.SERVICE_LOCATION}}
+
+      - name: Setup branch name
         run: |
           # Strip git ref prefix from version
-          echo "GPG_TTY=$(tty)" >> $GITHUB_ENV
           echo "BRANCH_NAME=$(echo ${{ github.ref }} | sed -e 's,.*/\(.*\),\1,')" >> $GITHUB_ENV
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          echo ${{ env.BRANCH_NAME }}
+
+      - name: Get version info from pom
+        id: getPomVersion
+        uses: mavrosxristoforos/get-xml-info@1.0
+        with:
+          xml-file: ./${{ env.SERVICE_LOCATION }}/pom.xml
+          xpath: /*[local-name()="project"]/*[local-name()="version"]
+
+      - name:  Extract the mosip-packet-creator jar and its dependency configs
+        run: |
+          cd  ./${{env.SERVICE_LOCATION}} 
+          unzip "release.zip"
+
+      - name: Get current date
+        id: date
+        run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
       - name: Build image
         run: |
-          cd "./${{env.SERVICE_LOCATION}}"
-          # docker build . --file Dockerfile --tag ${{ env.SERVICE_NAME }}
+          cd  ./${{env.SERVICE_LOCATION}}
+          mkdir docker-image-build
+          cp -r ./build_files ./docker-image-build/build_files
+          cp -r ./entrypoint.sh ./docker-image-build/entrypoint.sh
+          cp -r ./profile_resource ./docker-image-build/profile_resource
+          cp ./Dockerfile  ./docker-image-build/Dockerfile
+          
+          cd docker-image-build
           docker build . --file Dockerfile --build-arg SOURCE=mosip --build-arg COMMIT_HASH=$(git rev-parse HEAD) --build-arg COMMIT_ID=$(git rev-parse --short HEAD) --build-arg BUILD_TIME=${{steps.date.outputs.date}} --tag ${{ env.SERVICE_NAME }}
 
       - name: Log into registry
@@ -60,67 +135,18 @@ jobs:
       - name: Push image
         run: |
           IMAGE_ID=$NAMESPACE/$SERVICE_NAME
+          
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          echo "push version ${{steps.getPomVersion.outputs.info}}"
           if [[ $BRANCH_NAME == master ]]; then
             VERSION=latest
           else
             VERSION=$BRANCH_NAME
           fi
-          echo "push version $VERSION"
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
           docker tag $SERVICE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
-
-  sonar-analysis:
-    runs-on: ubuntu-latest
-    env:
-      NAMESPACE: ${{ secrets. dev_namespace_docker_hub }}
-      SERVICE_NAME: admin-ui
-      SERVICE_LOCATION: admin-ui
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '14'
-
-      - name: npm install
-        run: cd ${{ env.SERVICE_LOCATION }} && npm install --ignore-scripts
-
-      - name: npm build
-        run: cd ${{ env.SERVICE_LOCATION }} && npm run-script build -- --prod --base-href . --output-path=dist
-
-      - name: Setup branch and env
-        run: |
-          # Strip git ref prefix from version
-          echo "BRANCH_NAME=$(echo ${{ github.ref }} | sed -e 's,.*/\(.*\),\1,')" >> $GITHUB_ENV
-          echo "GPG_TTY=$(tty)" >> $GITHUB_ENV
-
-      - name: setup environment
-        run: |
-          # Strip git ref prefix from version
-          echo "GPG_TTY=$(tty)" >> $GITHUB_ENV
-          echo "BRANCH_NAME=$(echo ${{ github.ref }} | sed -e 's,.*/\(.*\),\1,')" >> $GITHUB_ENV
-
-      - name: run sonar analysis
-        run: |
-          cd "./${{env.SERVICE_LOCATION}}"
-          echo "sonar.host.url=https://sonarcloud.io/
-               sonar.login=${{ secrets.SONAR_TOKEN }}
-               sonar.projectKey=mosip_admin-ui
-               sonar.organization=${{ secrets.ORG_KEY }}
-               sonar.sourceEncoding=UTF-8
-               sonar.sources=src
-               sonar.exclusions=**/node_modules/**
-               sonar.tests=src
-               sonar.test.inclusions=**/*.spec.ts
-               sonar.typescript.lcov.reportPaths=coverage/lcov.info" >> sonar-project.properties
-          npm install sonar-scanner && npm run sonar
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  
