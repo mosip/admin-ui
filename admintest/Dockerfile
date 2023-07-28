@@ -33,11 +33,6 @@ USER ${container_user_uid}:${container_user_gid}
 
 COPY --chown=${container_user_uid}:${container_user} --chmod=771 ./entrypoint.sh ${work_dir}/entrypoint.sh
 COPY --chown=${container_user}:${container_user} ./build_files/ ${work_dir}
-COPY --chown=${container_user}:${container_user} ./profile_resource /tmp/profile_resource
-
-# set environmental variables
-ENV mountPath=/home//${container_user}/mountvolume
-ENV authCertsPath=/home/${container_user}/authcerts
 
 # set working directory
 WORKDIR ${work_dir}
