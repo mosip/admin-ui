@@ -8,7 +8,7 @@ on:
   push:
     branches:
       - '!release-branch'
-      - *
+      - '*'
 
 jobs:
   build-admin-ui:
