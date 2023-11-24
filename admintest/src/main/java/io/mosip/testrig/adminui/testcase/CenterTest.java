@@ -68,7 +68,8 @@ public class CenterTest extends BaseClass{
     Commons.dropdown(test,driver, By.xpath("(//*[@id='fieldName'])[4]"));
     Commons.dropdown(test,driver, By.xpath("(//*[@id='fieldName'])[5]"));
    
-  
+   
+  	
  try{   Commons.dropdown(test,driver, By.id("zone"));
  
  }catch(Exception e) {
@@ -93,13 +94,18 @@ public class CenterTest extends BaseClass{
     Commons.click(test,driver,By.cssSelector(".mat-list-item:nth-child(4) > .mat-list-item-content"));
     Commons.click(test,driver,By.cssSelector(".mat-list-item:nth-child(5) > .mat-list-item-content"));
     
-  //  Commons.enter(test,driver,By.id("holidayDate"),holidayDate);
-    Commons.calendar(holidayDate);
-    Commons.click(test,driver, By.id("createExceptionalHoliday"));
-    test.log(Status.INFO, "Click on Exceptional Holiday");
+    //  Commons.enter(test,driver,By.id("holidayDate"),holidayDate);
+   // Commons.calendar(holidayDate);
+  //  Commons.click(test,driver, By.id("createExceptionalHoliday"));
+   // test.log(Status.INFO, "Click on Exceptional Holiday");
     
     Commons.createRes(test,driver);
-   	Commons.filterCenter(test,driver, By.id("name"), data);
+  	test.log(Status.INFO, "Click on Create");
+  	Commons.filter(test,driver, By.id("name"), data);
+    
+   // Commons.createRes(test,driver);
+  	//test.log(Status.INFO, "Click on Create");
+ 	
    	
 
    	Commons.editCenter(test,driver,data+1,By.id("name"));
