@@ -1,15 +1,15 @@
-This Repsitory is used for Admin Portal Automation.
+This Repository is used for Admin Portal Automation.
 
 How To run : 
 	First Build Jar
-	Place VM args- java  -Dpath=https://env.mosip.net/ -Duserid=user -Dpassword=pwd -jar nameofAdminJar.jar
+	Place VM args- java  -Dpath=https://admin.env.mosip.net/ -DKeyclockURL=https://iam.env.mosip.net -Denv.user=api-internal.env  -Denv.endpoint=https://api-internal.dev3.mosip.net -jar nameofAdminJar.jar
 	Place jar in one folder along with src/main/resources files and folder and then run jar
 
 TestData Setup:
-	Config.properties
-		langcode:eng -- This is Admin login page language selection description placed in TestData.json
-		bulkwait:10000 -- This is Bulk upload wait
 	TestData.json
+		langcode:eng -- This is Admin login page language selection 
+		bulkwait:10000 -- This is Bulk upload wait
+	
 		Keep setExcludedGroups="" -- To run all the scenario mentioned below
 		Keep setExcludedGroups="BL,CT" -- To Exclude testcases execution based on below tags. 
 	
