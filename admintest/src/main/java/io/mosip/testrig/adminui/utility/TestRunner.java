@@ -94,7 +94,7 @@ testNg=new TestNG();
 		System.getProperties().setProperty("testng.outpur.dir", "testng-report");
 		testNg.setOutputDirectory("testng-report");
 		System.getProperties().setProperty("emailable.report2.name", "AdminUI" + "-"
-				+ ConfigManager.getiam_adminportal_path() + System.currentTimeMillis() + "-report.html");
+				+ ConfigManager.getiam_apienvuser() +"-"+ System.currentTimeMillis() + "-report.html");
 		
 		
 		testNg.run();
