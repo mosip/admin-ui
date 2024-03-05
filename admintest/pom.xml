@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.mosip.testrig.adminui</groupId>
   <artifactId>adminui</artifactId>
-  <version>1.2.1</version>
+  <version>1.2.0.1-SNAPSHOT</version>
   <name>admin-ui-automation</name>
   <description>admin-ui-automation</description>
   <url>https://github.com/mosip/admin-ui</url>
