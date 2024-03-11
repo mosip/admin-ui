@@ -14,7 +14,7 @@
                       matTooltip="{{ 'machines.keyboard-tooltip' | translate }}"
                       (click)="openKeyboard('primary')"
                       style="float: right; color: grey; cursor: pointer;"
-                      ><i class="material-icons">keyboard</i></span
+                      ><em class="material-icons">keyboard</em></span
                     >
                     <hr />
                     <br /><br />
@@ -109,10 +109,13 @@
 
                         <mat-form-field>
                           <input
+                            #keyboardRef
+                            #validity
                             matInput
                             [min]="minDate"
                             [matDatepicker]="picker"
                             formControlName="validity"
+                            (focus)="scrollPage(validity, 'primary', 'validity', 4)"
                             id="validity"
                             placeholder="{{ 'machines.validity' | translate }}"
                             required
@@ -161,7 +164,7 @@
                             <textarea
                             #keyboardRef
                             #publicKey
-                            (focus)="scrollPage(publicKey, 'primary', 'publicKey', 0)"
+                            (focus)="scrollPage(publicKey, 'primary', 'publicKey', 5)"
                             formControlName="publicKey"
                             id="publicKey"
                             matInput
@@ -184,7 +187,7 @@
                             <textarea
                             #keyboardRef
                             #signPublicKey
-                            (focus)="scrollPage(signPublicKey, 'primary', 'signPublicKey', 0)"
+                            (focus)="scrollPage(signPublicKey, 'primary', 'signPublicKey', 6)"
                             formControlName="signPublicKey"
                             id="signPublicKey"
                             matInput

@@ -16,11 +16,11 @@
                 <table>
                     <caption>Packet Status Information</caption>
                     <tr>
-                        <th>{{'packet-status.id' | translate}}</th>
+                        <th id="registrationId">{{'packet-status.id' | translate}}</th>
                         <td><strong>{{data[0].registrationId}}</strong></td>
                     </tr>
                     <tr>
-                        <th>{{'packet-status.status' | translate}}</th>
+                        <th id="Status">{{'packet-status.status' | translate}}</th>
                         <td><strong>{{statusCheck}}</strong></td>
                     </tr>
                 </table>
@@ -29,17 +29,17 @@
                 <table>
                     <caption>Timeline</caption>
                     <tr (click)="viewMore()">
-                        <th *ngIf="!showTimeline">{{'packet-status.viewMore' | translate}}</th>
-                        <th *ngIf="showTimeline">{{'packet-status.viewLess' | translate}}</th>
+                        <th id="viewMore" *ngIf="!showTimeline">{{'packet-status.viewMore' | translate}}</th>
+                        <th id="viewLess" *ngIf="showTimeline">{{'packet-status.viewLess' | translate}}</th>
                         <td>
-                            <i *ngIf="!showTimeline" class="material-icons">keyboard_arrow_down</i>
-                            <i *ngIf="showTimeline" class="material-icons">keyboard_arrow_up</i>
+                            <em *ngIf="!showTimeline" class="material-icons">keyboard_arrow_down</em>
+                            <em *ngIf="showTimeline" class="material-icons">keyboard_arrow_up</em>
                         </td>
                     </tr>
                 </table>
                 <ul *ngIf="showTimeline">
                     <li *ngFor="let item of data" [ngClass]="item.statusCode === 'SUCCESS' || item.statusCode === 'PROCESSED' ? 'complete' : ''">
-                        <i [ngClass]="item.statusCode === 'IN_PROGRESS' ? 'dot hollow-dot' : item.statusCode === 'SUCCESS' || item.statusCode === 'PROCESSED' ? 'milestone-complete dot' : 'dot incomplete-hollow' "></i>
+                        <em [ngClass]="item.statusCode === 'IN_PROGRESS' ? 'dot hollow-dot' : item.statusCode === 'SUCCESS' || item.statusCode === 'PROCESSED' ? 'milestone-complete dot' : 'dot incomplete-hollow' "></em>
                         <h3><div *ngIf = "item.transactionTypeCode">{{item.transactionTypeCode.replace("_", " ")}}</div></h3>
                         <p *ngIf="item.statusCode === 'SUCCESS'">
                             {{serverMessage[item.subStatusCode]}},   <span *ngIf = "item.createdDateTimes">{{item.createdDateTimes | date:'medium':'+0530'}} </span>                      
@@ -57,7 +57,7 @@
                 <table>
                     <caption>Error Information</caption>
                     <tr>
-                        <th>Error Message</th>
+                        <th id="errorMessage">Error Message</th>
                     </tr>
                     <tr>
                         <td><strong>{{errorMessage}}</strong></td>

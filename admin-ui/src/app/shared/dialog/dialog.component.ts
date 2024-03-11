@@ -385,13 +385,9 @@ export class DialogComponent implements OnInit {
           filter[0].autocomplete === 'true'
         ) {
           const filterValue = this.filterGroup.controls[key].value.toString();
-          if (filterValue.endsWith('*') && filterValue.startsWith('*')) {
+          if (filterValue.endsWith('*') || filterValue.startsWith('*') || filterValue.includes('*')) {
             filterType = 'contains';
-          } else if (filterValue.endsWith('*')) {
-            filterType = 'contains';
-          } else if (filterValue.includes('*')) {
-            filterType = 'contains';
-          } else {
+        } else {
             filterType = 'contains';
           }
         } else if (

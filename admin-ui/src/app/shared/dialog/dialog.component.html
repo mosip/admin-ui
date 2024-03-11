@@ -7,7 +7,7 @@
     <table class="mat-table">
       <caption>Missing Data Table</caption>
       <tr class="mat-row sticky-header" >
-        <th class="mat-header-cell table-header sticky-header"  *ngFor="let col of input.columnNames;">
+        <th id="missingData" class="mat-header-cell table-header sticky-header"  *ngFor="let col of input.columnNames;">
           <span>{{col[primaryLangCode]}}</span>
         </th>
       </tr>
@@ -211,7 +211,7 @@
 
 <div class="pop-up" *ngIf="input.case === 'CONFIRMATION'">
   <div class="pop-up-header">
-    <b mat-dialog-title>{{ input.title }}</b>
+    <strong mat-dialog-title>{{ input.title }}</strong>
     <div mat-dialog-content>
       <p style="white-space: pre-line">{{ input.message }}</p>
     </div>
@@ -248,7 +248,7 @@
      *ngIf="input.title === 'Success' || input.title === 'نجاح' || input.title === 'Succès'|| input.title === 'सफलता' || input.title === 'ಯಶಸ್ಸು' || input.title === 'வெற்றி'"   />
   </div>
   <div class="pop-up-header">
-    <b mat-dialog-title>{{ input.title }}</b>
+    <strong mat-dialog-title>{{ input.title }}</strong>
     <div mat-dialog-content>
       <div [innerText]="input.message"></div>
     </div>
@@ -264,7 +264,7 @@
 
 <div class="pop-up" *ngIf="input.case === 'ERROR'">
   <div class="pop-up-header">
-    <b mat-dialog-title>{{ input.title }}</b>
+    <strong mat-dialog-title>{{ input.title }}</strong>
     <div mat-dialog-content>
       <!-- <p>{{ input.message }}</p> -->
       <div [innerText]="input.message"></div>
@@ -274,7 +274,7 @@
 
 <div class="pop-up" *ngIf="input.case === 'STEPS-MESSAGE'">
   <div class="pop-up-header">
-    <b mat-dialog-title>{{ createUpdateSteps.title }}</b>
+    <strong mat-dialog-title>{{ createUpdateSteps.title }}</strong>
     <div mat-dialog-content>
       <p>{{ input.message }}</p>
     </div>
@@ -290,7 +290,7 @@
 
 <div class="pop-up" *ngIf="input.case === 'NOZONE'">
   <div class="pop-up-header">
-    <b mat-dialog-title>{{ input.title }}</b>
+    <strong mat-dialog-title>{{ input.title }}</strong>
     <div mat-dialog-content>
       <div [innerText]="input.message"></div>
     </div>

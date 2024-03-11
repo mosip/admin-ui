@@ -32,9 +32,9 @@
                                     <li class="list" [ngClass]="{'active': selectedItem === categoryList?.code}"
                                         (click)="onCategory(categoryList)">
                                         <span>{{categoryList?.name}}({{categoryList?.code}})</span>
-                                        <span><i class="material-icons">
+                                        <span><em class="material-icons">
                                                 keyboard_arrow_right
-                                            </i></span></li>
+                                        </em></span></li>
                                 </ng-container>
                             </ul>
                         </div>
@@ -47,9 +47,9 @@
                                 <ng-container *ngFor="let mappedItem of mappedDocList; let i = index">
                                     <li class="list">
                                         <span>{{mappedItem?.name}}</span>
-                                        <span><i class="material-icons" (click)="onClose(mappedItem, i)">
+                                        <span><em class="material-icons" (click)="onClose(mappedItem, i)">
                                                 close
-                                            </i></span></li>
+                                        </em></span></li>
                                 </ng-container>
                             </ul>
                         </div>
@@ -62,9 +62,9 @@
                                 <ng-container *ngFor="let unMappedItem of unMappedDocList; let i = index">
                                     <li class="list">
                                         <span>{{unMappedItem?.name}}</span>
-                                        <span><i class="material-icons" (click)="onAdd(unMappedItem, i)">
+                                        <span><em class="material-icons" (click)="onAdd(unMappedItem, i)">
                                                 add
-                                            </i></span></li>
+                                        </em></span></li>
                                 </ng-container>
                             </ul>
                         </div>

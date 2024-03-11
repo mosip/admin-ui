@@ -9,14 +9,14 @@
                 <div class="sub-item1">
                     <mat-card>
                         <mat-card-header class="header">
-                            <b>{{'masterData.common' | translate}}</b>
+                            <strong>{{'masterData.common' | translate}}</strong>
                         </mat-card-header>
                         <ng-container *ngFor="let itemList of masterDataCommonList; let i = index">
                             <mat-card-content class="content" [style.marginTop.px]="i === 0 ? 10:0" (click)="onList(itemList)" id="{{itemList.actionURL}}">
                                 <span style="margin-top: 5px; margin-left: 5px;">{{itemList?.label[primaryLang]}}</span>
-                                <span style="text-align: right"><i class="material-icons">
+                                <span style="text-align: right"><em class="material-icons">
                                         {{arrowDirection}}
-                                    </i></span>
+                                </em></span>
                             </mat-card-content>
                         </ng-container>
                     </mat-card>
@@ -24,14 +24,14 @@
                 <div class="sub-item2">
                     <mat-card >
                         <mat-card-header class="header">
-                            <b>{{'masterData.dynamicField' | translate}}</b>
+                            <strong>{{'masterData.dynamicField' | translate}}</strong>
                         </mat-card-header>
                         <ng-container>
                             <mat-card-content class="content" (click)="dynamicFeildAdd()" id="createDynamicField">
-                                <span style="margin-top: 5px; margin-left: 5px;"><b>{{'masterData.createDynamicField' | translate}}</b></span>
-                                <span style="text-align: right"><i class="material-icons">
+                                <span style="margin-top: 5px; margin-left: 5px;"><strong>{{'masterData.createDynamicField' | translate}}</strong></span>
+                                <span style="text-align: right"><em class="material-icons">
                                         add
-                                    </i></span>
+                                </em></span>
                             </mat-card-content>
                         </ng-container>
                         <ng-container *ngFor="let itemList of dynamicfieldDistinctValue; let i = index">
@@ -40,9 +40,9 @@
                                     <span *ngIf="itemList.description">{{itemList.description}}</span>
                                     <span *ngIf="!itemList.description">{{itemList.name}}</span>
                                 </span>
-                                <span style="text-align: right"><i class="material-icons">
+                                <span style="text-align: right"><em class="material-icons">
                                         {{arrowDirection}}
-                                    </i></span>
+                                </em></span>
                             </mat-card-content>
                         </ng-container>
                     </mat-card >
@@ -54,14 +54,14 @@
                 <div class="sub-item1">
                     <mat-card >
                         <mat-card-header class="header">
-                            <b>{{'masterData.device-definition' | translate}}</b>
+                            <strong>{{'masterData.device-definition' | translate}}</strong>
                         </mat-card-header>
                         <ng-container *ngFor="let itemList of masterDataDeviceList; let j = index">
                             <mat-card-content class="content" [style.marginTop.px]="j === 0 ? 10:0" (click)="onList(itemList)" id="{{itemList.actionURL}}">
                                 <span style="margin-top: 5px; margin-left: 5px;">{{itemList?.label[primaryLang]}}</span>
-                                <span style="text-align: right"><i class="material-icons">
+                                <span style="text-align: right"><em class="material-icons">
                                         {{arrowDirection}}
-                                    </i></span>
+                                </em></span>
                             </mat-card-content>
                         </ng-container>
                     </mat-card >
@@ -69,14 +69,14 @@
                 <div class="sub-item2">
                     <mat-card>
                         <mat-card-header class="header">
-                            <b>{{'masterData.machine-definition' | translate}}</b>
+                            <strong>{{'masterData.machine-definition' | translate}}</strong>
                         </mat-card-header>
                         <ng-container *ngFor="let itemList of masterDataMachineList; let k = index">
                             <mat-card-content class="content" [style.marginTop.px]="k === 0 ? 10:0" (click)="onList(itemList)" id="{{itemList.actionURL}}">
                                 <span style="margin-top: 5px; margin-left: 5px;">{{itemList?.label[primaryLang]}}</span>
-                                <span style="text-align: right"><i class="material-icons">
+                                <span style="text-align: right"><em class="material-icons">
                                         {{arrowDirection}}
-                                    </i></span>
+                                </em></span>
                             </mat-card-content>
                         </ng-container>
                     </mat-card>
@@ -84,14 +84,14 @@
                 <div class="sub-item3">
                     <mat-card>
                         <mat-card-header class="header">
-                            <b>{{'masterData.document-definition' | translate}}</b>
+                            <strong>{{'masterData.document-definition' | translate}}</strong>
                         </mat-card-header>
                         <ng-container *ngFor="let itemList of masterDataDocumentList; let l = index">
                             <mat-card-content class="content" [style.marginTop.px]="l === 0 ? 10:0" (click)="onList(itemList)" id="{{itemList.actionURL}}">
                                 <span style="margin-top: 5px; margin-left: 5px;">{{itemList?.label[primaryLang]}}</span>
-                                <span style="text-align: right"><i class="material-icons">
+                                <span style="text-align: right"><em class="material-icons">
                                         {{arrowDirection}}
-                                    </i></span>
+                                </em></span>
                             </mat-card-content>
                         </ng-container>
                     </mat-card>

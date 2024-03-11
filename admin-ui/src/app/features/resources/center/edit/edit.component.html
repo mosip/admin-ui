@@ -17,7 +17,7 @@
               (click)="openKeyboard('primary')" 
               style="color: grey; cursor: pointer;"
               [ngStyle]="isPrimaryLangRTL ? {'float':'left'} : {'float':'right'}">
-              <i class="material-icons">keyboard</i></span>
+              <em class="material-icons">keyboard</em></span>
             <hr />
             <h3>{{ "center.center-details" | translate }}</h3>
             <div class="flex-display">
@@ -119,7 +119,7 @@
           <div *ngIf="secondaryLanguageLabels && secondaryLang && showSecondaryForm" [formGroup]="secondaryForm"
             [ngClass]="isSecondaryLangRTL ? 'secondary-form' : 'secondary-form-ltr'" [dir]="isSecondaryLangRTL ? 'rtl' : 'ltl'">
             <mat-form-field style="padding-bottom: 10px;">
-              <mat-label><b>{{ "center.selectLanguage" | translate }}</b></mat-label>
+              <mat-label><strong>{{ "center.selectLanguage" | translate }}</strong></mat-label>
               <mat-select formControlName="selectLanguage" id="selectLanguage"
                 (selectionChange)="handleChangeSecondaryLang('selectLanguage')">
                 <mat-option *ngFor="let data of selectLanguagesArr" [value]="data.code">
@@ -133,7 +133,7 @@
               (click)="openKeyboard('secondary')"
               style="color: grey; cursor: pointer;"
               [ngStyle]="isSecondaryLangRTL ? {'float':'left'} : {'float':'right'}">
-              <i class="material-icons">keyboard</i></span>
+              <em class="material-icons">keyboard</em></span>
             <hr />
             <h3>{{ secondaryLanguageLabels["center-details"] }}</h3>
             <div class="flex-display">
@@ -678,7 +678,7 @@
                   *ngIf="common.exceptionalHolidays.value.length>=0 && data.exceptionHolidayDate!==null">
                   <span>{{ data.exceptionHolidayDate }}</span>
                   <div style="position: absolute;margin-left: 65px;margin-top: -18px;cursor: pointer;color: #FF4081;" (click)="deleteHoliday(i)">
-                    <i class="material-icons" [ngClass]="isPrimaryLangRTL ? 'icon-padding-right' : 'icon-padding-left'">cancel</i>
+                    <em class="material-icons" [ngClass]="isPrimaryLangRTL ? 'icon-padding-right' : 'icon-padding-left'">cancel</em>
                   </div>
                 </div>
               </ng-container>

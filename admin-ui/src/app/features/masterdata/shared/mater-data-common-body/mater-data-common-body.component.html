@@ -10,7 +10,7 @@
                   (click)="openKeyboard('primary', primaryData.langCode)"
                   style="color: grey; cursor: pointer;"
                   [ngStyle]="isPrimaryLangRTL ? {'float':'left'} : {'float':'right'}"
-                  ><i class="material-icons">keyboard</i></span
+                  ><em class="material-icons">keyboard</em></span
                 >
                 <hr />
                 <br /><br />
@@ -423,7 +423,7 @@
             <mat-divider [vertical]="true" [inset]="true"></mat-divider>
               <div *ngIf="showSecondaryForm" class="secondary-form" [dir]="secondaryLang==='ara' ? 'rtl' : 'ltr'">
                 <mat-form-field style="padding-bottom: 10px;">
-                <mat-label><b>{{ "center.selectLanguage" | translate }}</b></mat-label>
+                <mat-label><strong>{{ "center.selectLanguage" | translate }}</strong></mat-label>
                   <mat-select
                     id="secondaryLang"
                     [(value)]="secondaryLang"
@@ -444,7 +444,7 @@
                   (click)="openKeyboard('secondary', '')"
                   style="color: grey; cursor: pointer;"
                   [ngStyle]="isPrimaryLangRTL ? {'float':'left'} : {'float':'right'}"
-                  ><i class="material-icons">keyboard</i></span
+                  ><em class="material-icons">keyboard</em></span
                 >
                 <hr  [ngStyle]="isPrimaryLangRTL ? {'margin-top': '17px'} : {'margin-top': '0px'}"   />
                 <br /><br />
@@ -784,7 +784,7 @@
               matTooltip="{{ 'center.keyboard-tooltip' | translate }}"
               (click)="openKeyboard('primary','')"
               style="float: right; color: grey; cursor: pointer;"
-              ><i class="material-icons">keyboard</i></span
+              ><em class="material-icons">keyboard</em></span
             >
             <hr />
             <br /><br />
@@ -814,7 +814,7 @@
               matTooltip="{{languageNames['keyboard-tooltip'] | translate }}"
               (click)="openKeyboard('secondary', '')"
               style="float: right; color: grey; cursor: pointer;"
-              ><i class="material-icons">keyboard</i></span
+              ><em class="material-icons">keyboard</em></span
             >
             <hr />
             <br /><br />

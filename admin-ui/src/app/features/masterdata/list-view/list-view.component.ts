@@ -81,19 +81,18 @@ export class ListViewComponent implements OnDestroy {
     }
   }
 
-  loadBlacklistedWords(): void {
-    new Promise(async (resolve, reject) => {
-      const data = [];
-      await this.getMasterDataTypeValues('all').then(response => {
-        if (response['data']) {
-          data.push(...response['data']);
-          console.log(response);
-        }
-      });
-      this.masterData = data;      
-      //this.paginatorOptions.totalEntries = this.masterData.length;
-      resolve(true);
-    });
+  async loadBlacklistedWords(): Promise<void> {
+    try {
+      const response = await this.getMasterDataTypeValues('all');
+      if (response && response['data']) {
+        this.masterData = response['data'];
+        console.log(response);
+      }
+      // this.paginatorOptions.totalEntries = this.masterData.length;
+    } catch (error) {
+      console.error('Error loading blacklisted words:', error);
+      throw error;
+    }
   }
 
   loadData() {

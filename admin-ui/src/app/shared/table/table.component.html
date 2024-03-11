@@ -1,10 +1,12 @@
 <div class="container">
   <table class="mat-table">
     <tr class="mat-row sticky-header">
-      <th *ngIf="showRadioButton"></th>
+      <th *ngIf="showRadioButton" id="tableData"></th>
       <th
         *ngFor="let columnName of displayedColumns; let i = index"
         class="mat-header-cell table-header sticky-header"
+        [ngStyle]="{'width': columnName?.styles?.width ? columnName.styles.width : auto}"
+        id="tableColumn"
       >
         <span class="columnName-sort-span" 
           ><span
@@ -37,7 +39,7 @@
               class="sort-icon" /></span
         ></span>
       </th>
-      <th class="table-header sticky-header">&emsp;</th>
+      <th class="table-header sticky-header" id="tableHeader">&emsp;</th>
     </tr>
     <tr *ngFor="let data of tableData; index as i" class="mat-header-row">
       <td *ngIf="showRadioButton">
