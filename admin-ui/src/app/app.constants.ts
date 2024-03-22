@@ -140,32 +140,32 @@ export const navItems = [
         icon: null,
         route: '/admin/keymanager/generatecsr',
         auditEventId: 'ADM-004',
-        roles: ['GLOBAL_ADMIN', 'ZONAL_ADMIN', 'MASTERDATA_ADMIN']
+        roles: ['KEY_MAKER']
       },      
       {
         displayName: 'menuItems.item7.subItem3',
         icon: null,
         route: '/admin/keymanager/getcertificate',
         auditEventId: 'ADM-004',
-        roles: ['GLOBAL_ADMIN', 'ZONAL_ADMIN', 'MASTERDATA_ADMIN']
+        roles: ['KEY_MAKER']
       },
       {
         displayName: 'menuItems.item7.subItem4',
         icon: null,
         route: '/admin/keymanager/uploadcertificate',
         auditEventId: 'ADM-004',
-        roles: ['GLOBAL_ADMIN', 'ZONAL_ADMIN', 'MASTERDATA_ADMIN']
+        roles: ['KEY_MAKER']
       },
       {
         displayName: 'menuItems.item7.subItem5',
         icon: null,
         route: '/admin/keymanager/uploadotherdomaincertificate',
         auditEventId: 'ADM-004',
-        roles: ['GLOBAL_ADMIN', 'ZONAL_ADMIN', 'MASTERDATA_ADMIN']
+        roles: ['KEY_MAKER']
       }
     ],
     auditEventId: 'ADM-003',
-    roles: ['GLOBAL_ADMIN', 'ZONAL_ADMIN', 'MASTERDATA_ADMIN', 'KEY_MAKER']
+    roles: ['KEY_MAKER']
   }
 ];
 
