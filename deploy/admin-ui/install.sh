@@ -8,7 +8,8 @@ if [ $# -ge 1 ] ; then
 fi
 
 NS=admin
-CHART_VERSION=1.3.0-beta.1-develop
+CHART_VERSION=0.0.1-develop
+COPY_UTIL=../copy_cm_func.sh
 
 echo Create $NS namespace
 kubectl create ns $NS
@@ -19,8 +20,9 @@ function installing_admin_ui() {
   helm repo update
 
   echo Copy configmaps
-  sed -i 's/\r$//' copy_cm.sh
-  ./copy_cm.sh
+  $COPY_UTIL configmap global default $NS
+  $COPY_UTIL configmap artifactory-share artifactory $NS
+  $COPY_UTIL configmap config-server-share config-server $NS
 
   API_HOST=$(kubectl get cm global -o jsonpath={.data.mosip-api-internal-host})
   ADMIN_HOST=$(kubectl get cm global -o jsonpath={.data.mosip-admin-host})
