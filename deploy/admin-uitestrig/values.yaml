@@ -3,5 +3,5 @@ modules:
     enabled: true
     image:
       registry: docker.io
-      repository: mosipqa/admintest
-      tag: develop
+      repository: mosipid/uitest-admin
+      tag: 1.3.0-beta.1
