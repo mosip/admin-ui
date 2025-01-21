@@ -31,7 +31,6 @@
                           [value]="primaryData[field.name]"                        
                           required={{field.ismandatory}}
                           *ngIf="field.name !== 'fieldVal'"
-                          readonly = true
                         />
                       </span>
                       <span *ngIf="pageName === 'Dynamic Field' && field.name === 'name' && isCreateForm">
@@ -180,7 +179,6 @@
                         [value]="primaryData[field.name]"
                         required={{field.ismandatory}}
                         rows="3" cols="40"
-                        readonly = true
                       ></textarea>
                       </span>
                       <span *ngIf="pageName === 'Dynamic Field'  && isCreateForm && field.name === 'description'">
@@ -465,7 +463,6 @@
                           }}"
                           [value]="secondaryData[field.name]"
                           *ngIf="field.name !== 'fieldVal'"
-                          readonly = true
                         />
                       </span>
                       <span *ngIf="pageName === 'Dynamic Field' && secondaryData[field.name] === '' && field.name === 'name'">
@@ -576,7 +573,6 @@
                           }}"
                           [value]="secondaryData[field.name]"
                           rows="3" cols="40"
-                          readonly = true
                         ></textarea>
                       </span>
                       <span *ngIf="pageName === 'Dynamic Field' && secondaryData[field.name] === '' && field.name === 'description'">
