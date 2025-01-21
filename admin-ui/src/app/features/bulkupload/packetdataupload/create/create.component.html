@@ -83,7 +83,7 @@
                 {{'genericerror.fieldValidation' | translate}}
               </mat-error>
             </mat-form-field>
-            <label class="labelfileupload">{{'uploadcertificate.uploadYourFile' | translate}} <span style="color:red;">*</span></label>
+            <label class="labelfileupload" for="fileInput">{{'uploadcertificate.uploadYourFile' | translate}} <span style="color:red;">*</span></label>
               <div class="fileuploadcontainer" appDnd (fileDropped)="onFileDropped($event)" id="custom-file-input">
               <input (click)="$event.target.value=null" type="file" #fileInput id="fileInput" (change)="onFileSelect($event)"/>
               <label style="margin-right: 1rem;display: flex;" for="fileInput">

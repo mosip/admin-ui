@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Sanitizer, SecurityContext } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { AppConfigService } from 'src/app/app-config.service';
 import { AuditService } from 'src/app/core/services/audit.service';
@@ -38,7 +38,7 @@ export class DownloadCardComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private dataStorageService: DataStorageService,
     public dialog: MatDialog,
-    private sanitizer:DomSanitizer,
+    private sanitizer: Sanitizer,
     private router: Router
   ) {
     translate.use(appService.getConfig().primaryLangCode);
@@ -81,7 +81,7 @@ export class DownloadCardComponent implements OnInit {
   }
 
   renderImage(){
-    this.applicantPhoto = this.sanitizer.bypassSecurityTrustUrl(this.data.applicantPhoto);
+    this.applicantPhoto = this.sanitizer.sanitize(SecurityContext.URL, this.data.applicantPhoto);
   }  
 
   search() {    

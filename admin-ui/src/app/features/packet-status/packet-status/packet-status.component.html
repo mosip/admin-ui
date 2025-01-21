@@ -6,7 +6,7 @@
         <mat-form-field class="packet-status__input-placer">
             <input matInput placeholder="{{'packet-status.input-text' | translate}}" [(ngModel)]="id"/>
         </mat-form-field>
-        <img src="./assets/images/search.png" (click)="search()" alt="search" class="packet-status__image-placer" height="20px" width="20px">
+        <img src="./assets/images/search.png" (click)="search()" alt="search" class="packet-status__image-placer" height="20px" width="20px" (keypress)="search()">
         <mat-error style="margin-left: 30px ;font-size: 9.5px" *ngIf="error">{{errorMessage | translate}}</mat-error>
     </mat-card>
     <mat-card *ngIf="showDetails" style="border-radius: 0;">
@@ -28,7 +28,7 @@
             <div>
                 <table>
                     <caption>Timeline</caption>
-                    <tr (click)="viewMore()">
+                    <tr (click)="viewMore()" (keypress)="viewMore()">
                         <th id="viewMore" *ngIf="!showTimeline">{{'packet-status.viewMore' | translate}}</th>
                         <th id="viewLess" *ngIf="showTimeline">{{'packet-status.viewLess' | translate}}</th>
                         <td>
