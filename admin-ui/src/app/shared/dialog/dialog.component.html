@@ -12,8 +12,8 @@
         </th>
       </tr>
       <tr *ngFor="let data of missingData; index as i" class="mat-header-row">
-        <td id="data{{i}}" (click)="navigateToItem(data)" class="mat-cell">{{data.id}}</td>
-        <td  (click)="navigateToItem(data)" class="mat-cell">{{data.fieldValue}}</td>
+        <td id="data{{i}}" (click)="navigateToItem(data)" class="mat-cell" (keypress)="navigateToItem(data)">{{data.id}}</td>
+        <td  (click)="navigateToItem(data)" class="mat-cell" (keypress)="navigateToItem(data)">{{data.fieldValue}}</td>
       </tr>
     </table>
     <p *ngIf="noMissingDataFlag" style="text-align: center">{{'center.popupMessages.noData.message' | translate}}</p>

@@ -6,7 +6,7 @@
             </div>
         </div>
         <div class="item2" *ngIf="router.indexOf('map') === -1">
-            <h4></h4>
+            <h4>{{'center.details' | translate}}</h4>
         </div>
         <mat-divider [vertical]="true" [inset]="true" *ngIf="router.indexOf('map') === -1"></mat-divider>
         <div class="item3" *ngIf="router.indexOf('map') === -1">

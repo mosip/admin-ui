@@ -22,7 +22,7 @@
         <mat-form-field class="packet-status__input-placer">
             <input matInput placeholder="Enter Registration ID" [(ngModel)]="id"/>
         </mat-form-field>
-        <img src="./assets/images/search.png" (click)="search()" alt="search" class="packet-status__image-placer" height="20px" width="20px">
+        <img src="./assets/images/search.png" (click)="search()" alt="search" class="packet-status__image-placer" height="20px" width="20px" (keypress)="search()">
         <mat-error style="margin-left: 30px ;font-size: 9.5px" *ngIf="error">{{'download-card.error' | translate}}</mat-error>
     </mat-card>
     <mat-card *ngIf="showDetails" style="border-radius: 0;margin-top: 20px;">
@@ -37,7 +37,7 @@
                         </tr>
                     </thead>
                     <tr>
-                        <td><img style="width: 150px;height: 200px;" [src]="applicantPhoto" alt="Applicant Photo"></td>
+                        <td><img style="width: 150px;height: 200px;" [src]="applicantPhoto" alt="Applicant"></td>
                         <td>
                             <table>
                                 <caption>Download Card Details</caption>
@@ -59,8 +59,8 @@
                                 <tr>
                                     <td>
                                         <mat-button-toggle-group name="favoriteColor" aria-label="Favorite Color">
-                                          <mat-button-toggle  (click)="captureSelection('true')" value="true"><mat-icon style="color: green;">check</mat-icon>&nbsp;&nbsp;{{'download-card.verifyanddownload' | translate}}</mat-button-toggle>
-                                          <mat-button-toggle  (click)="captureSelection('false')" value="flase"><mat-icon style="color:red;">clear</mat-icon>&nbsp;&nbsp;{{'download-card.reject' | translate}}</mat-button-toggle>
+                                          <mat-button-toggle  (click)="captureSelection('true')" value="true"  (keypress)="captureSelection('true')"><mat-icon style="color: green;">check</mat-icon>&nbsp;&nbsp;{{'download-card.verifyanddownload' | translate}}</mat-button-toggle>
+                                          <mat-button-toggle  (click)="captureSelection('false')" value="false"  (keypress)="captureSelection('false')"><mat-icon style="color:red;">clear</mat-icon>&nbsp;&nbsp;{{'download-card.reject' | translate}}</mat-button-toggle>
                                         </mat-button-toggle-group>
                                     </td>
                                     <th id="actionHeader">Action</th>
