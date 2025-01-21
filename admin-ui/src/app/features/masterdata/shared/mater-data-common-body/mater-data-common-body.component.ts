@@ -430,7 +430,9 @@ export class MaterDataCommonBodyComponent implements OnInit {
         this.getTemplateFileFormat();
         if(type === "setValue")
           this.secondaryData.name = this.primaryData.name;
-          this.secondaryData.id = this.primaryData.id;        
+          this.secondaryData.id = this.primaryData.id;   
+          this.secondaryData.fileFormatCode = this.primaryData.fileFormatCode;  
+          this.secondaryData.moduleId = this.primaryData.moduleId;
       }else if(this.url === "device-specs"){
         this.secondaryData = {"name":"","brand":"","model":"","deviceTypeCode":"","minDriverversion":"","description":"","langCode":this.secondaryLang,"isActive":true,"id":""};
       }else if(this.url === "device-types"){
@@ -1149,15 +1151,16 @@ export class MaterDataCommonBodyComponent implements OnInit {
       });
   }
 
-  fetchFileFormatOptions() {
+  async fetchFileFormatOptions(): Promise<void> {
     let self = this;
     this.dataStorageService
       .getDropDownValuesForMasterData('templatefileformats/' + this.primaryLang)
-      .subscribe((response) => {
+      .subscribe(async(response) => {
         const dbFileFormats = response.response.templateFileFormats;
 
-        this.http.get<any>('assets/entity-spec/templates.json').subscribe((jsonResponse) => {
-          const jsonFileFormats = jsonResponse['columnsToDisplay'].find(
+        try{
+          const templateResponse = await this.http.get('assets/entity-spec/templates.json').toPromise();
+          const jsonFileFormats = templateResponse['columnsToDisplay'].find(
             (col: { name: string }) => col.name === 'fileFormatCode'
           ).options;
 
@@ -1179,19 +1182,23 @@ export class MaterDataCommonBodyComponent implements OnInit {
               self.fileFormatOptions = uniqueFileFormats;
               return true;
             });
+          } catch (error){
+            console.log(error);
+            console.log("Error fetching file formats");
+          }
         });
-      });
   }
 
-  fetchModuleNameOptions() {
+  async fetchModuleNameOptions(): Promise<void> {
     let self = this;
     this.dataStorageService
       .getDropDownValuesForMasterData('modules/' + this.primaryLang)
-      .subscribe((response) => {
+      .subscribe(async(response) => {
         const dbModules = response.response.modules;
-  
-        this.http.get<any>('assets/entity-spec/templates.json').subscribe((jsonResponse) => {
-          const jsonModules = jsonResponse['columnsToDisplay'].find(
+        
+        try{
+          const moduleResponse = await this.http.get('assets/entity-spec/templates.json').toPromise();
+          const jsonModules = moduleResponse['columnsToDisplay'].find(
             (col: { name: string }) => col.name === 'moduleId'
           ).options;
   
@@ -1213,8 +1220,11 @@ export class MaterDataCommonBodyComponent implements OnInit {
             self.moduleNameOptions = uniqueModules;
             return true;
           });
+        } catch (error){
+          console.log(error);
+          console.log("Error fetching file formats");
+        }
         });
-      });
   }
 
 }
