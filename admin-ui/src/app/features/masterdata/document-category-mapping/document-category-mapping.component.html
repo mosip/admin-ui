@@ -30,7 +30,7 @@
                             <ul class="unOrderList">
                                 <ng-container *ngFor="let categoryList of allDocCategoryList; let i = index">
                                     <li class="list" [ngClass]="{'active': selectedItem === categoryList?.code}"
-                                        (click)="onCategory(categoryList)">
+                                        (click)="onCategory(categoryList)" (keypress)="onCategory(categoryList)">
                                         <span>{{categoryList?.name}}({{categoryList?.code}})</span>
                                         <span><em class="material-icons">
                                                 keyboard_arrow_right
@@ -47,7 +47,7 @@
                                 <ng-container *ngFor="let mappedItem of mappedDocList; let i = index">
                                     <li class="list">
                                         <span>{{mappedItem?.name}}</span>
-                                        <span><em class="material-icons" (click)="onClose(mappedItem, i)">
+                                        <span><em class="material-icons" (click)="onClose(mappedItem, i)" (keypress)="onClose(mappedItem, i)">
                                                 close
                                         </em></span></li>
                                 </ng-container>
@@ -62,7 +62,7 @@
                                 <ng-container *ngFor="let unMappedItem of unMappedDocList; let i = index">
                                     <li class="list">
                                         <span>{{unMappedItem?.name}}</span>
-                                        <span><em class="material-icons" (click)="onAdd(unMappedItem, i)">
+                                        <span><em class="material-icons" (click)="onAdd(unMappedItem, i)" (keypress)="onAdd(unMappedItem, i)">
                                                 add
                                         </em></span></li>
                                 </ng-container>

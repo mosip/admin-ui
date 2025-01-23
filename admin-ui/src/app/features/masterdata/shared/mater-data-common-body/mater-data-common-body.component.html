@@ -10,6 +10,7 @@
                   (click)="openKeyboard('primary', primaryData.langCode)"
                   style="color: grey; cursor: pointer;"
                   [ngStyle]="isPrimaryLangRTL ? {'float':'left'} : {'float':'right'}"
+                  (keypress)="openKeyboard('primary', primaryData.langCode)"
                   ><em class="material-icons">keyboard</em></span
                 >
                 <hr />
@@ -30,7 +31,6 @@
                           [value]="primaryData[field.name]"                        
                           required={{field.ismandatory}}
                           *ngIf="field.name !== 'fieldVal'"
-                          readonly = true
                         />
                       </span>
                       <span *ngIf="pageName === 'Dynamic Field' && field.name === 'name' && isCreateForm">
@@ -179,7 +179,6 @@
                         [value]="primaryData[field.name]"
                         required={{field.ismandatory}}
                         rows="3" cols="40"
-                        readonly = true
                       ></textarea>
                       </span>
                       <span *ngIf="pageName === 'Dynamic Field'  && isCreateForm && field.name === 'description'">
@@ -444,6 +443,7 @@
                   (click)="openKeyboard('secondary', '')"
                   style="color: grey; cursor: pointer;"
                   [ngStyle]="isPrimaryLangRTL ? {'float':'left'} : {'float':'right'}"
+                  (keypress)="openKeyboard('secondary', '')"
                   ><em class="material-icons">keyboard</em></span
                 >
                 <hr  [ngStyle]="isPrimaryLangRTL ? {'margin-top': '17px'} : {'margin-top': '0px'}"   />
@@ -463,7 +463,6 @@
                           }}"
                           [value]="secondaryData[field.name]"
                           *ngIf="field.name !== 'fieldVal'"
-                          readonly = true
                         />
                       </span>
                       <span *ngIf="pageName === 'Dynamic Field' && secondaryData[field.name] === '' && field.name === 'name'">
@@ -574,7 +573,6 @@
                           }}"
                           [value]="secondaryData[field.name]"
                           rows="3" cols="40"
-                          readonly = true
                         ></textarea>
                       </span>
                       <span *ngIf="pageName === 'Dynamic Field' && secondaryData[field.name] === '' && field.name === 'description'">
@@ -784,6 +782,7 @@
               matTooltip="{{ 'center.keyboard-tooltip' | translate }}"
               (click)="openKeyboard('primary','')"
               style="float: right; color: grey; cursor: pointer;"
+              (keypress)="openKeyboard('primary','')"
               ><em class="material-icons">keyboard</em></span
             >
             <hr />
@@ -814,6 +813,7 @@
               matTooltip="{{languageNames['keyboard-tooltip'] | translate }}"
               (click)="openKeyboard('secondary', '')"
               style="float: right; color: grey; cursor: pointer;"
+              (keypress)="openKeyboard('primary','')"
               ><em class="material-icons">keyboard</em></span
             >
             <hr />

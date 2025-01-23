@@ -11,7 +11,7 @@
             <strong class="title">{{ 'devices.language' | translate }}</strong>
             <span *ngIf="!disableForms" matTooltip="{{ 'devices.keyboard-tooltip' | translate }}"
               (click)="openKeyboard('primary')"  style="color: grey; cursor: pointer;"
-              [ngStyle]="isPrimaryLangRTL ? {'float':'left'} : {'float':'right'}"><em
+              [ngStyle]="isPrimaryLangRTL ? {'float':'left'} : {'float':'right'}" (keypress)="openKeyboard('primary')"><em
                 class="material-icons">keyboard</em></span>
             <hr />
             <br /><br />

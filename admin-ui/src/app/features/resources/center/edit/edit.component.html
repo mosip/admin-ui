@@ -16,7 +16,8 @@
             <span *ngIf="!disablePrimaryForm" matTooltip="{{ 'center.keyboard-tooltip' | translate }}"
               (click)="openKeyboard('primary')" 
               style="color: grey; cursor: pointer;"
-              [ngStyle]="isPrimaryLangRTL ? {'float':'left'} : {'float':'right'}">
+              [ngStyle]="isPrimaryLangRTL ? {'float':'left'} : {'float':'right'}"
+              (keypress)="openKeyboard('primary')">
               <em class="material-icons">keyboard</em></span>
             <hr />
             <h3>{{ "center.center-details" | translate }}</h3>
@@ -132,7 +133,8 @@
             <span *ngIf="!disableSecondaryForm" matTooltip="{{ secondaryLanguageLabels['keyboard-tooltip'] }}"
               (click)="openKeyboard('secondary')"
               style="color: grey; cursor: pointer;"
-              [ngStyle]="isSecondaryLangRTL ? {'float':'left'} : {'float':'right'}">
+              [ngStyle]="isSecondaryLangRTL ? {'float':'left'} : {'float':'right'}"
+              (keypress)="openKeyboard('secondary')">
               <em class="material-icons">keyboard</em></span>
             <hr />
             <h3>{{ secondaryLanguageLabels["center-details"] }}</h3>
@@ -677,7 +679,7 @@
                   style="height: 30px;width: 100px;border: 1px solid #FF4081;border-radius: 30px;padding: 7px;margin: 15px;cursor: pointer;font-size: 11px;"
                   *ngIf="common.exceptionalHolidays.value.length>=0 && data.exceptionHolidayDate!==null">
                   <span>{{ data.exceptionHolidayDate }}</span>
-                  <div style="position: absolute;margin-left: 65px;margin-top: -18px;cursor: pointer;color: #FF4081;" (click)="deleteHoliday(i)">
+                  <div style="position: absolute;margin-left: 65px;margin-top: -18px;cursor: pointer;color: #FF4081;" (click)="deleteHoliday(i)" (keypress)="deleteHoliday(i)">
                     <em class="material-icons" [ngClass]="isPrimaryLangRTL ? 'icon-padding-right' : 'icon-padding-left'">cancel</em>
                   </div>
                 </div>

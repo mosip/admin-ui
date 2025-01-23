@@ -19,6 +19,7 @@
           <span
             *ngIf="!columnName.noSort"
             (click)="sortColumn(columnName.name, i)"
+            (keypress)="sortColumn(columnName.name, i)"
             ><img
               *ngIf="sortIconTrackerArray[i] === 0"
               src="assets/images/icon_table_sort_both.png"
@@ -49,6 +50,7 @@
           name="radios"
           id="radio1"
           (click)="selectedCenter(data, button)"
+          (keypress)="selectedCenter(data, button)"
         />
       </td>
       <td
@@ -56,6 +58,7 @@
         class="mat-cell"
         (click)="getTableRowData(data, i, item)"
         [ngClass]="{ 'text-alignment': item === 'name' && imageSource }"
+        (keypress)="getTableRowData(data, i, item)"
       >
         <span class="flex-display" [ngStyle]="tableStyle(i, data[item], item)"
           ><span *ngIf="item === 'fieldVal' && data[item]"
