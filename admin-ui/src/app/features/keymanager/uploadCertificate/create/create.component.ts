@@ -19,7 +19,7 @@ export class CreateComponent {
 
   createForm: FormGroup;
   dropDownValues = ["Insert","Update", "Delete"];
-  applicationId = [{id:"PRE_REGISTRATION", value:"PRE_REGISTRATION  3years"}, {id:"REGISTRATION_PROCESSOR", value:"REGISTRATION_PROCESSOR  3years"}, {id:"REGISTRATION", value:"REGISTRATION  3years"}, {id:"IDA", value:"IDA  3years"}, {id:"ID_REPO", value:"ID_REPO  3years"}, {id:"KERNEL", value:"KERNEL  3years"}, {id:"ROOT", value:"ROOT  5years"}, {id:"PMS", value:"PMS  3years"}];
+  applicationId = [{id:"PRE_REGISTRATION", value:"PRE_REGISTRATION "}, {id:"REGISTRATION_PROCESSOR", value:"REGISTRATION_PROCESSOR "}, {id:"REGISTRATION", value:"REGISTRATION "}, {id:"IDA", value:"IDA "}, {id:"ID_REPO", value:"ID_REPO "}, {id:"KERNEL", value:"KERNEL "}, {id:"ROOT", value:"ROOT "}, {id:"PMS", value:"PMS "}];
   subscribed: any;
   fileName = "";
   fileData:any;
