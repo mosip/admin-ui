@@ -13,13 +13,14 @@ import Utils from 'src/app/app.utils';
 import { MatDialog } from '@angular/material';
 import { DialogComponent } from 'src/app/shared/dialog/dialog.component';
 import { HeaderService } from 'src/app/core/services/header.service';
+import {distinctUntilChanged, filter, map, startWith} from "rxjs/operators";
 
 @Component({
   selector: 'app-view',
   templateUrl: './view.component.html',
   styleUrls: ['./view.component.scss']
 })
-export class ViewComponent implements OnInit {
+export class ViewComponent implements OnInit, OnDestroy {
 
   displayedColumns = [];
   actionButtons = [];
@@ -52,7 +53,7 @@ export class ViewComponent implements OnInit {
     private translateService: TranslateService,
     private auditService: AuditService
   ) {
-    this.getUserConfigs();
+    //this.getUserConfigs();
     this.primaryLang = this.headerService.getUserPreferredLanguage();
     
     this.translateService.use(this.primaryLang);
@@ -60,10 +61,20 @@ export class ViewComponent implements OnInit {
       console.log(response);
       this.errorMessages = response.errorPopup;
     });
-    this.subscribed = router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        if(this.displayedColumns)
-          this.getUserConfigs();
+    this.subscribed = this.router.events.pipe(
+      // Fire once immediately with the current URL
+      startWith(new NavigationEnd(0, this.router.url, this.router.url)),
+      // Only react to completed navigations
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      // Compare on the final URL (after redirects), not on event object identity
+      map(e => e.urlAfterRedirects),
+      // Prevent duplicate calls when the URL hasn't actually changed
+      distinctUntilChanged(),
+    ).subscribe(() => {
+      // Guard against undefined configs; run only when columns are defined
+      if (this.displayedColumns) {
+        // Load/refresh user configuration for the current route
+        this.getUserConfigs();
       }
     });
   }
