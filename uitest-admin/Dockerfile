@@ -10,9 +10,9 @@ RUN printf '%s\n' \
   && apk add --no-cache \
      bash curl wget unzip ca-certificates \
      chromium chromium-chromedriver \
-     xorg-server-xvfb \
+     xvfb \
      nss freetype harfbuzz libxi \
-     fontconfig ttf-dejavu \
+     fontconfig font-dejavu \
   && fc-cache -f
 
 # Install kubectl (latest stable)
