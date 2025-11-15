@@ -1,53 +1,53 @@
-# Start with a base image that includes Java 21
-FROM openjdk:21-slim
-
-# Install additional dependencies, such as Selenium, Chrome, and kubectl
+# Base image: Java 21 JRE on Alpine
+FROM eclipse-temurin:21-jre-alpine
+# Install dependencies: bash, curl, wget, unzip, Chromium + ChromeDriver, Xvfb, fonts, and common libs
 USER root
+RUN printf '%s\n' \
+  "https://dl-cdn.alpinelinux.org/alpine/v3.20/main" \
+  "https://dl-cdn.alpinelinux.org/alpine/v3.20/community" \
+  > /etc/apk/repositories \
+  && apk update \
+  && apk add --no-cache \
+     bash curl wget unzip ca-certificates \
+     chromium chromium-chromedriver \
+     xvfb \
+     nss freetype harfbuzz libxi \
+     fontconfig font-dejavu \
+  && fc-cache -f
 
-RUN apt-get update && \
-    apt-get install -y wget curl unzip xvfb libxi6 libgconf-2-4 chromium chromium-driver
-
-# Install kubectl
-RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+# Install kubectl (latest stable)
+RUN curl -L -s https://dl.k8s.io/release/stable.txt -o /tmp/kver && \
+    curl -LO "https://dl.k8s.io/release/$(cat /tmp/kver)/bin/linux/amd64/kubectl" && \
     chmod +x kubectl && \
-    mv kubectl /usr/local/bin/kubectl
-
-# Define build-time arguments and labels
+    mv kubectl /usr/local/bin/kubectl && \
+    rm -f /tmp/kver
+# Build-time args and labels
 ARG SOURCE
 ARG COMMIT_HASH
 ARG COMMIT_ID
 ARG BUILD_TIME
-
-# Set labels for metadata
 LABEL source=${SOURCE}
 LABEL commit_hash=${COMMIT_HASH}
 LABEL commit_id=${COMMIT_ID}
 LABEL build_time=${BUILD_TIME}
-
-# Define build-time arguments for user and group
+# Build-time args for user/group
 ARG container_user=mosip
 ARG container_user_group=mosip
 ARG container_user_uid=1001
 ARG container_user_gid=1001
-
-# Set working directory for the user
+# Working dir
 ENV work_dir=/home/${container_user}/
-
-# Create a new user with specified permissions
-RUN groupadd -g ${container_user_gid} ${container_user_group} \
-    && useradd -u ${container_user_uid} -g ${container_user_group} -s /bin/bash -m ${container_user} -d ${work_dir} \
-    && chown -R ${container_user}:${container_user} /home/${container_user}/  
-
-# Switch to the specified user for the subsequent commands
+# Create non-root user and home
+RUN addgroup -g ${container_user_gid} ${container_user_group} && \
+    adduser -D -u ${container_user_uid} -G ${container_user_group} -s /bin/bash -h ${work_dir} ${container_user} && \
+    chown -R ${container_user}:${container_user_group} ${work_dir}
+# Switch to app user
 USER ${container_user_uid}:${container_user_gid}
-
-# Copy your application files into the container
-COPY --chown=${container_user_uid}:${container_user} --chmod=771 ./entrypoint.sh ${work_dir}/entrypoint.sh
-COPY --chown=${container_user}:${container_user} ./src/main/resources/ ${work_dir}/resources/
-COPY --chown=${container_user_uid}:${container_user} ./target/*.jar ${work_dir}
-
-# Set the working directory
+# Copy application files
+COPY --chown=${container_user_uid}:${container_user_gid} --chmod=771 ./entrypoint.sh ${work_dir}/entrypoint.sh
+COPY --chown=${container_user}:${container_user_group} ./src/main/resources/ ${work_dir}/resources/
+COPY --chown=${container_user_uid}:${container_user_gid} ./target/*.jar ${work_dir}
+# Set working directory
 WORKDIR /home/${container_user}/
-
-# Entrypoint for the container
+# Entrypoint
 ENTRYPOINT ["/bin/bash", "-c", "./entrypoint.sh"]
