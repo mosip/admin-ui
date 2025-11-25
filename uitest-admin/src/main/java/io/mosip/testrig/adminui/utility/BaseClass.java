@@ -22,7 +22,7 @@ import io.mosip.testrig.adminui.kernel.util.KeycloakUserManager;
 
 public class BaseClass {
 
-	private static final Logger logger = Logger.getLogger(TestRunner.class);
+	protected static final Logger logger = Logger.getLogger(TestRunner.class);
 
 	// Make driver thread-safe
 	protected static ThreadLocal<WebDriver> driverThread = new ThreadLocal<>();
@@ -72,7 +72,7 @@ public class BaseClass {
 		logger.info("launch url --" + envPath);
 		driver().manage().window().maximize();
 		Commons.wait(500);
-		driver().manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+		driver().manage().timeouts().implicitlyWait(java.time.Duration.ofSeconds(20));
 
 		String language1 = ConfigManager.getloginlang();
 		String loginlang;
@@ -117,7 +117,7 @@ public class BaseClass {
 		String contents[] = null;
 		try {
 			String langcode = ConfigManager.getloginlang();
-			File directoryPath = new File(TestRunner.getResourcePath() + "//BulkUploadFiles//" + langcode + "//");
+			File directoryPath = new File(TestRunner.getResourcePath() + File.separator + "BulkUploadFiles" + File.separator + langcode + File.separator);
 			if (directoryPath.exists()) {
 				contents = directoryPath.list();
 				for (int i = 0; i < contents.length; i++) {

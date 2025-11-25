@@ -356,21 +356,20 @@ public class Commons  extends BaseClass{
 	    try {
 	        // Open calendar
 	        Commons.click(driver(), By.xpath("//*[@class='mat-datepicker-toggle']//button"));
-	        Thread.sleep(500);
+	        wait(500);
 
 	        // Expand year/month selector
 	        Commons.click(driver(), By.xpath("//*[@class='mat-calendar-arrow']"));
-	        Thread.sleep(500);
-
+	        wait(500);
 	        // Click year
 	        String yearText = convertDigits(String.valueOf(year), locale);
 	        Commons.click(driver(), By.xpath("//*[normalize-space(text())='" + yearText + "']"));
-	        Thread.sleep(500);
+	        wait(500);
 
 	        // Select month (index based to avoid translation issues)
 	        List<WebElement> months = driver().findElements(By.xpath("//*[@class='mat-calendar-body-cell-content']"));
 	        months.get(month - 1).click();
-	        Thread.sleep(500);
+	        wait(500);
 
 	        // Select day (convert if Arabic locale)
 	        String dayText = convertDigits(String.valueOf(day), locale);

@@ -30,6 +30,7 @@ public class MachineTest extends BaseClass{
 			Commons.dropdown(driver(), By.id("zone"));
 
 		}catch(Exception e) {
+			logger.info("Zone dropdown not found or not required: " + e.getMessage());
 		}
 		Commons.dropdown(driver(),By.id("regCenterId"));    
 		Commons.createRes(driver());

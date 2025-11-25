@@ -67,48 +67,56 @@ public class EmailableReport implements IReporter {
 
 	@Override
 	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDir) {
-	    try (PrintWriter writer = createWriter(outputDir)) {
-	        this.writer = writer;
+		try (PrintWriter writer = createWriter(outputDir)) {
+			this.writer = writer;
 
-	        for (ISuite suite : suites) suiteResults.add(new SuiteResult(suite));
+			for (ISuite suite : suites)
+				suiteResults.add(new SuiteResult(suite));
 
-	        writeDocumentStart();
-	        writeHead();
-	        writeBody();
-	        writeDocumentEnd();
-	    } catch (IOException e) {
-	        logger.error("Error creating TestNG report", e);
-	        return;
-	    }
+			writeDocumentStart();
+			writeHead();
+			writeBody();
+			writeDocumentEnd();
+		} catch (IOException e) {
+			logger.error("Error creating TestNG report", e);
+			return;
+		}
 
-	    // --- Prepare filename details ---
-	    String lang = getValueForKey("loginlang");
-	    if (lang == null || lang.isEmpty()) lang = "eng";
+		// --- Prepare filename details ---
+		 String lang = ConfigManager.getValueForKey("loginlang");
+		if (lang == null || lang.isEmpty())
+			lang = "eng";
 
-	    String date = java.time.LocalDateTime.now()
-	            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"));
+		String date = java.time.LocalDateTime.now()
+				.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"));
 
-	    String env = "base-run";
-	    try {
-	        String envUser = ConfigManager.getiam_apienvuser();
-	        if (envUser != null && !envUser.isEmpty())
-	            env = envUser.replaceAll(".*?\\.([^\\.]+\\.[^\\.]+).*", "$1");
-	    } catch (Exception ignored) {}
+		String env = "base-run";
+		try {
+			String envUser = ConfigManager.getiam_apienvuser();
+			if (envUser != null && !envUser.isEmpty())
+				env = envUser.replaceAll(".*?\\.([^\\.]+\\.[^\\.]+).*", "$1");
+		} catch (Exception ignored) {
+		}
 
-	    int total = totalPassedTests + totalSkippedTests + totalFailedTests;
+		int total = totalPassedTests + totalSkippedTests + totalFailedTests;
 
-	    String newName = String.format(
-	        "ADMINUI-%s-%s-%s-report_T-%d_P-%d_S-%d_F-%d.html",
-	        env, lang, date, total, totalPassedTests, totalSkippedTests, totalFailedTests
-	    );
+		String newName = String.format("ADMINUI-%s-%s-%s-report_T-%d_P-%d_S-%d_F-%d.html", env, lang, date, total,
+				totalPassedTests, totalSkippedTests, totalFailedTests);
 
-	    // --- Rename file ---
-	    File oldFile = new File(outputDir, fileName);
-	    File newFile = new File(outputDir, newName);
-	    if (oldFile.exists() && oldFile.renameTo(newFile))
-	        logger.info("Report renamed to: " + newName);
+		// --- Rename file ---
+		File oldFile = new File(outputDir, fileName);
+		File newFile = new File(outputDir, newName);
+		if (oldFile.exists()) {
+			if (newFile.exists()) {
+				logger.warn("Target report file already exists: " + newName);
+			} else if (oldFile.renameTo(newFile)) {
+				logger.info("Report renamed to: " + newName);
+			} else {
+				logger.error("Failed to rename report to: " + newName);
+			}
+		}
 	}
-	
+
 	private String getCommitId() {
 		Properties properties = new Properties();
 		try (InputStream is = EmailableReport.class.getClassLoader().getResourceAsStream("git.properties")) {
@@ -198,11 +206,8 @@ public class EmailableReport implements IReporter {
 
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 			formattedDate = currentDate.format(formatter);
-			Process process = Runtime.getRuntime().exec("git rev-parse --abbrev-ref HEAD");
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			branch = reader.readLine();
 		} catch (Exception e) {
-			// TODO: handle exception
+			 formattedDate = currentDate.toString();
 		}
 		totalPassedTests = 0;
 		totalSkippedTests = 0;
@@ -385,8 +390,10 @@ public class EmailableReport implements IReporter {
 																						// specified CSS class
 								.append("<td><a href=\"#m").append(scenarioIndex).append("\">").append(methodName)
 								.append("</a></td>") // Table cell with a hyperlink
-								.append("<td>").append(String.format("%.2f", scenarioDurationMin)).append("</td></tr>"); // Table cell with
-																								// scenario duration
+								.append("<td>").append(String.format("%.2f", scenarioDurationMin)).append("</td></tr>"); // Table
+																															// cell
+																															// with
+						// scenario duration
 
 						scenarioIndex++;
 					}
@@ -426,10 +433,6 @@ public class EmailableReport implements IReporter {
 		}
 	}
 
-	/**
-	 * Writes the scenario details for the results of a given state for a single
-	 * test.
-	 */
 	private int writeScenarioDetails(List<ClassResult> classResults, int startingScenarioIndex) {
 		int scenarioIndex = startingScenarioIndex;
 		for (ClassResult classResult : classResults) {
@@ -451,9 +454,6 @@ public class EmailableReport implements IReporter {
 		return scenarioIndex - startingScenarioIndex;
 	}
 
-	/**
-	 * Writes the details for an individual test scenario.
-	 */
 	private void writeScenario(int scenarioIndex, String label, ITestResult result) {
 		writer.print("<h3 id=\"m");
 		writer.print(scenarioIndex);
@@ -847,25 +847,5 @@ public class EmailableReport implements IReporter {
 			return results;
 		}
 	}
-	
-	private static String getValueForKey(String key) {
-	    String value = System.getenv(key);
-	    if (value == null || value.isEmpty()) {
-	        try {
-	            java.lang.reflect.Field field = io.mosip.testrig.adminui.kernel.util.ConfigManager.class.getDeclaredField("propsKernel");
-	            field.setAccessible(true);
-	            Object props = field.get(null);
-	            if (props instanceof java.util.Properties) {
-	                value = ((java.util.Properties) props).getProperty(key);
-	            }
-	        } catch (Exception e) {
-	            value = "";
-	        }
-	    }
-
-	    return value;
-	}
-
-
 
 }

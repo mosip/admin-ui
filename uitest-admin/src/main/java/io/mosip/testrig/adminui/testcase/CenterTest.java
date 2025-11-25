@@ -47,7 +47,9 @@ public class CenterTest extends BaseClass{
 		Commons.click(driver(),By.cssSelector(".mat-list-item:nth-child(3) > .mat-list-item-content"));
 		Commons.click(driver(),By.cssSelector(".mat-list-item:nth-child(4) > .mat-list-item-content"));
 		Commons.click(driver(),By.cssSelector(".mat-list-item:nth-child(5) > .mat-list-item-content"));
+		String loginLang = ConfigManager.getloginlang();
 		Commons.calendar(holidayDate);
+		Commons.calendar(holidayDate, loginLang.toLowerCase());
 		Commons.click(driver(), By.id("createExceptionalHoliday"));
 		Commons.createRes(driver());
 		Commons.filterCenter(driver(), By.id("name"), data);
