@@ -25,7 +25,7 @@
 		"loginlang": "sin",
 		"preappend": "0",
 		"jsonObjName": "identity",
-		"headless": "yes",
+		"headless": "no",
 		"Docker":"yes",
 		"bulkwait": "10000",
 		"dummyData":"blocklistwordss",
@@ -34,15 +34,15 @@
 		"langcode": [
 			{
 				"language": "tam",
-				"value": "à®¤à®®à®¿à®´à¯�"
+				"value": "தமிழ்"
 			},
 			{
 				"language": "kan",
-				"value": "à²•à²¨à³�à²¨à²¡"
+				"value": "ಕನ್ನಡ"
 			},
 			{
 				"language": "hin",
-				"value": "à¤¹à¤¿à¤‚à¤¦à¥€"
+				"value": "हिंदी"
 			},
 			{
 				"language": "eng",
@@ -50,11 +50,11 @@
 			},
 			{
 				"language": "fra",
-				"value": "FranÃ§ais"
+				"value": "Français"
 			},
 			{
 				"language": "ara",
-				"value": "Arabic"
+				"value": "عربي"
 			}
 		]
 	}
