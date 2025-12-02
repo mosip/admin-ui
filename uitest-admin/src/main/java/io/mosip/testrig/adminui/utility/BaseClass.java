@@ -1,6 +1,7 @@
 package io.mosip.testrig.adminui.utility;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -15,6 +16,9 @@ import org.testng.Reporter;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
+import org.testng.ITestResult;
+
+import com.aventstack.extentreports.ExtentTest;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.mosip.testrig.adminui.kernel.util.ConfigManager;
@@ -42,8 +46,10 @@ public class BaseClass {
 	}
 
 	@BeforeMethod
-	public void setUp() throws Exception {
-		Reporter.log("BaseClass", true);
+	public void setUp(Method testMethod) throws Exception {
+		AdminExtentReportManager.initReport();
+
+		Reporter.log("BaseClass setup started", true);
 		logger.info("Start set up");
 
 		if (System.getProperty("os.name").equalsIgnoreCase("Linux") && ConfigManager.getdocker().equals("yes")) {
@@ -69,7 +75,7 @@ public class BaseClass {
 		js = (JavascriptExecutor) driver();
 		vars = new HashMap<String, Object>();
 		driver().get(envPath);
-		logger.info("launch url --" + envPath);
+		logger.info("Launch URL: " + envPath);
 		driver().manage().window().maximize();
 		Commons.wait(500);
 		driver().manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
@@ -83,24 +89,67 @@ public class BaseClass {
 			loginlang = JsonUtil.JsonObjArrayListParsing2(ConfigManager.getlangcode());
 		}
 
-		Commons.click(driver(), By.xpath("//*[@id='kc-locale-dropdown']"));
+		Commons.click(driver(), By.xpath("//*[@id='kc-locale-dropdown']"), "Clicked on language dropdown");
 
 		String xpath = "//li/a[" + "normalize-space(text())='" + loginlang + "' "
 				+ "or contains(translate(normalize-space(text()), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '"
 				+ language1.toLowerCase() + "') " + "]";
 
-		Commons.click(driver(), By.xpath(xpath));
+		Commons.click(driver(), By.xpath(xpath), "Selected language: " + loginlang);
 
-		Commons.enter(driver(), By.id("username"), userid);
-		Commons.enter(driver(), By.id("password"), password);
-		Commons.click(driver(), By.xpath("//input[@name='login']"));
+		Commons.enter(driver(), By.id("username"), userid, "Entered username");
+		Commons.enter(driver(), By.id("password"), password, "Entered password");
+		Commons.click(driver(), By.xpath("//input[@name='login']"), "Clicked login button");
+
+		if (AdminExtentReportManager.getTest() == null) {
+			String className = this.getClass().getSimpleName();
+			String methodName = testMethod.getName();
+
+			String lang = "unknown";
+			try {
+				lang = ConfigManager.getloginlang();
+			} catch (Exception ignored) {
+			}
+
+			String cleanName = className + " | " + methodName + " | Language: " + lang;
+
+			AdminExtentReportManager.createTest(cleanName);
+			AdminExtentReportManager.logStep("Setup complete for " + cleanName);
+		}
 	}
 
-	@AfterMethod
-	public void tearDown() {
-		if (driverThread.get() != null) {
-			driverThread.get().quit();
-			driverThread.remove();
+	@AfterMethod(alwaysRun = true)
+	public void tearDown(ITestResult result) {
+		try {
+			if (result != null && result.getStatus() == ITestResult.FAILURE) {
+				try {
+					WebDriver drv = driver();
+					if (drv != null) {
+						byte[] screenshot = ((org.openqa.selenium.TakesScreenshot) drv)
+								.getScreenshotAs(org.openqa.selenium.OutputType.BYTES);
+						String base64 = java.util.Base64.getEncoder().encodeToString(screenshot);
+						ExtentTest test = AdminExtentReportManager.getTest();
+						if (test != null) {
+							test.fail("❌ Test Failed: " + result.getName());
+							test.fail(result.getThrowable());
+						}
+						AdminExtentReportManager.attachScreenshotFromBase64(base64, "Failure Screenshot");
+					}
+				} catch (Exception e) {
+					logger.warn("Unable to capture screenshot in tearDown: " + e.getMessage());
+				}
+			} else if (result != null && result.getStatus() == ITestResult.SUCCESS) {
+				AdminExtentReportManager.getTest().pass("✅ Test Passed: " + result.getName());
+			} else if (result != null && result.getStatus() == ITestResult.SKIP) {
+				AdminExtentReportManager.getTest().skip("⚠️ Test Skipped: " + result.getName());
+			}
+		} finally {
+			if (driverThread.get() != null) {
+				driverThread.get().quit();
+				driverThread.remove();
+			}
+			AdminExtentReportManager.flushReport();
+			AdminExtentReportManager.removeTest();
 		}
 	}
 
@@ -143,9 +192,7 @@ public class BaseClass {
 			}
 			return result.toString();
 		} else {
-
 			return number;
 		}
 	}
-
 }
