@@ -36,9 +36,6 @@ import io.mosip.testrig.adminui.fw.util.AdminTestUtil;
 import io.mosip.testrig.adminui.kernel.util.ConfigManager;
 import io.mosip.testrig.adminui.kernel.util.S3Adapter;
 
-/**
- * Reporter that generates a single-page HTML report of the test results.
- */
 public class EmailableReport implements IReporter {
 	static Logger logger = Logger.getLogger(EmailableReport.class);
 
@@ -66,49 +63,71 @@ public class EmailableReport implements IReporter {
 	}
 
 	@Override
-	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDir) {
-	    try (PrintWriter writer = createWriter(outputDir)) {
-	        this.writer = writer;
+	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
+		try {
+			writer = createWriter(outputDirectory);
+		} catch (IOException e) {
+			logger.error("Unable to create output file", e);
+			return;
+		}
+		for (ISuite suite : suites) {
+			suiteResults.add(new SuiteResult(suite));
+		}
+		writeDocumentStart();
+		writeHead();
+		writeBody();
+		writeDocumentEnd();
+		writer.close();
 
-	        for (ISuite suite : suites) suiteResults.add(new SuiteResult(suite));
+		int totalTestCases = totalPassedTests + totalSkippedTests + totalFailedTests;
+		String oldString = System.getProperty("emailable.report2.name");
+		String temp = "-report_T-" + totalTestCases + "_P-" + totalPassedTests + "_S-" + totalSkippedTests + "_F-"
+				+ totalFailedTests;
+		String newString = oldString.replace("-report", temp);
 
-	        writeDocumentStart();
-	        writeHead();
-	        writeBody();
-	        writeDocumentEnd();
-	    } catch (IOException e) {
-	        logger.error("Error creating TestNG report", e);
-	        return;
-	    }
+		File orignialReportFile = new File(System.getProperty("user.dir") + "/"
+				+ System.getProperty("testng.outpur.dir") + "/" + System.getProperty("emailable.report2.name"));
+		logger.info("reportFile is::" + System.getProperty("user.dir") + "/" + System.getProperty("testng.outpur.dir")
+				+ "/" + System.getProperty("emailable.report2.name"));
 
-	    // --- Prepare filename details ---
-	    String lang = getValueForKey("loginlang");
-	    if (lang == null || lang.isEmpty()) lang = "eng";
+		File newReportFile = new File(
+				System.getProperty("user.dir") + "/" + System.getProperty("testng.outpur.dir") + "/" + newString);
+		logger.info("New reportFile is::" + System.getProperty("user.dir") + "/"
+				+ System.getProperty("testng.outpur.dir") + "/" + newString);
 
-	    String date = java.time.LocalDateTime.now()
-	            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"));
+		if (orignialReportFile.exists()) {
+			if (orignialReportFile.renameTo(newReportFile)) {
+				orignialReportFile.delete();
+				logger.info("Report File re-named successfully!");
 
-	    String env = "base-run";
-	    try {
-	        String envUser = ConfigManager.getiam_apienvuser();
-	        if (envUser != null && !envUser.isEmpty())
-	            env = envUser.replaceAll(".*?\\.([^\\.]+\\.[^\\.]+).*", "$1");
-	    } catch (Exception ignored) {}
+				if (ConfigManager.getPushReportsToS3().equalsIgnoreCase("yes")) {
+					S3Adapter s3Adapter = new S3Adapter();
+					boolean isStoreSuccess = false;
+					boolean isStoreSuccess2 = false;
+					try {
+						isStoreSuccess = s3Adapter.putObject(ConfigManager.getS3Account(), "Adminui", null, null,
+								newString, newReportFile);
+						logger.info("isStoreSuccess:: " + isStoreSuccess);
 
-	    int total = totalPassedTests + totalSkippedTests + totalFailedTests;
+						/* Need to figure how to handle EXTENT report handling */
 
-	    String newName = String.format(
-	        "ADMINUI-%s-%s-%s-report_T-%d_P-%d_S-%d_F-%d.html",
-	        env, lang, date, total, totalPassedTests, totalSkippedTests, totalFailedTests
-	    );
-
-	    // --- Rename file ---
-	    File oldFile = new File(outputDir, fileName);
-	    File newFile = new File(outputDir, newName);
-	    if (oldFile.exists() && oldFile.renameTo(newFile))
-	        logger.info("Report renamed to: " + newName);
+					} catch (Exception e) {
+						logger.error("error occured while pushing the object" + e.getMessage());
+					}
+					if (isStoreSuccess && isStoreSuccess2) {
+						logger.info("Pushed report to S3");
+					} else {
+						logger.error("Failed while pushing file to S3");
+					}
+				}
+			} else {
+				logger.error("Renamed report file doesn't exist");
+			}
+		} else {
+			logger.error("Original report File does not exist!");
+		}
 	}
-	
+
 	private String getCommitId() {
 		Properties properties = new Properties();
 		try (InputStream is = EmailableReport.class.getClassLoader().getResourceAsStream("git.properties")) {
@@ -193,7 +212,6 @@ public class EmailableReport implements IReporter {
 		String formattedDate = null;
 		LocalDate currentDate = LocalDate.now();
 		String branch = null;
-
 		try {
 
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -218,7 +236,6 @@ public class EmailableReport implements IReporter {
 					+ ConfigManager.getiam_apienvuser().replaceAll(".*?\\.([^\\.]+)\\..*", "$1") + " ---- "
 					+ getCommitId()));
 			writer.print("</th></tr>");
-
 			writer.print("<tr><th colspan=\"7\"><span class=\"not-bold\"><pre>");
 			writer.print(Utils.escapeHtml("Server Component Details " + AdminTestUtil.getServerComponentsDetails()));
 			writer.print("</pre></span>");
@@ -252,9 +269,7 @@ public class EmailableReport implements IReporter {
 				writeTableData(integerFormat.format(passedTests), (passedTests > 0 ? "num green-bg" : "num"));
 				writeTableData(integerFormat.format(skippedTests), (skippedTests > 0 ? "num orange-bg" : "num"));
 				writeTableData(integerFormat.format(failedTests), (failedTests > 0 ? "num attn" : "num"));
-				double minutes = duration / 60000.0;
-				writeTableData(String.format("%.2f", minutes), "num");
-
+				writeTableData(decimalFormat.format(duration), "num");
 				/*
 				 * writeTableData(testResult.getIncludedGroups());
 				 * writeTableData(testResult.getExcludedGroups());
@@ -286,9 +301,6 @@ public class EmailableReport implements IReporter {
 		writer.print("</table>");
 	}
 
-	/**
-	 * Writes a summary of all the test scenarios.
-	 */
 	protected void writeScenarioSummary() {
 		writer.print("<table id='summary'>");
 		writer.print("<thead>");
@@ -335,10 +347,6 @@ public class EmailableReport implements IReporter {
 		writer.print("</table>");
 	}
 
-	/**
-	 * Writes the scenario summary for the results of a given state for a single
-	 * test.
-	 */
 	private int writeScenarioSummary(String description, List<ClassResult> classResults, String cssClassPrefix,
 			int startingScenarioIndex) {
 		int scenarioCount = 0;
@@ -368,13 +376,10 @@ public class EmailableReport implements IReporter {
 
 						ITestResult result = results.get(i);
 						// String [] scenarioDetails = getScenarioDetails(result);
-
 						// String scenarioName = Utils.escapeHtml("Scenario_" + scenarioDetails[0]);
 						// String scenarioDescription = Utils.escapeHtml(scenarioDetails[1]);
-
 						long scenarioStart = result.getStartMillis();
-						long scenarioDurationMs = result.getEndMillis() - scenarioStart;
-						double scenarioDurationMin = scenarioDurationMs / 60000.0;
+						long scenarioDuration = result.getEndMillis() - scenarioStart;
 
 						// buffer.append("<tr class=\"").append(cssClass).append("\">").append("<td><a
 						// href=\"#m")
@@ -385,9 +390,8 @@ public class EmailableReport implements IReporter {
 																						// specified CSS class
 								.append("<td><a href=\"#m").append(scenarioIndex).append("\">").append(methodName)
 								.append("</a></td>") // Table cell with a hyperlink
-								.append("<td>").append(String.format("%.2f", scenarioDurationMin)).append("</td></tr>"); // Table cell with
+								.append("<td>").append(scenarioDuration).append("</td></tr>"); // Table cell with
 																								// scenario duration
-
 						scenarioIndex++;
 					}
 					scenariosPerClass += resultsCount;
@@ -403,9 +407,6 @@ public class EmailableReport implements IReporter {
 		return scenarioCount;
 	}
 
-	/**
-	 * Writes the details for all test scenarios.
-	 */
 	protected void writeScenarioDetails() {
 		int scenarioIndex = 0;
 		for (SuiteResult suiteResult : suiteResults) {
@@ -426,10 +427,6 @@ public class EmailableReport implements IReporter {
 		}
 	}
 
-	/**
-	 * Writes the scenario details for the results of a given state for a single
-	 * test.
-	 */
 	private int writeScenarioDetails(List<ClassResult> classResults, int startingScenarioIndex) {
 		int scenarioIndex = startingScenarioIndex;
 		for (ClassResult classResult : classResults) {
@@ -451,9 +448,6 @@ public class EmailableReport implements IReporter {
 		return scenarioIndex - startingScenarioIndex;
 	}
 
-	/**
-	 * Writes the details for an individual test scenario.
-	 */
 	private void writeScenario(int scenarioIndex, String label, ITestResult result) {
 		writer.print("<h3 id=\"m");
 		writer.print(scenarioIndex);
@@ -525,46 +519,18 @@ public class EmailableReport implements IReporter {
 		writer.print("</div>");
 	}
 
-	/**
-	 * Writes a TH element with the specified contents and CSS class names.
-	 * 
-	 * @param html       the HTML contents
-	 * @param cssClasses the space-delimited CSS classes or null if there are no
-	 *                   classes to apply
-	 */
 	protected void writeTableHeader(String html, String cssClasses) {
 		writeTag("th", html, cssClasses);
 	}
 
-	/**
-	 * Writes a TD element with the specified contents.
-	 * 
-	 * @param html the HTML contents
-	 */
 	protected void writeTableData(String html) {
 		writeTableData(html, null);
 	}
 
-	/**
-	 * Writes a TD element with the specified contents and CSS class names.
-	 * 
-	 * @param html       the HTML contents
-	 * @param cssClasses the space-delimited CSS classes or null if there are no
-	 *                   classes to apply
-	 */
 	protected void writeTableData(String html, String cssClasses) {
 		writeTag("td", html, cssClasses);
 	}
 
-	/**
-	 * Writes an arbitrary HTML element with the specified contents and CSS class
-	 * names.
-	 * 
-	 * @param tag        the tag name
-	 * @param html       the HTML contents
-	 * @param cssClasses the space-delimited CSS classes or null if there are no
-	 *                   classes to apply
-	 */
 	protected void writeTag(String tag, String html, String cssClasses) {
 		writer.print("<");
 		writer.print(tag);
@@ -580,9 +546,6 @@ public class EmailableReport implements IReporter {
 		writer.print(">");
 	}
 
-	/**
-	 * Groups {@link TestResult}s by suite.
-	 */
 	protected static class SuiteResult {
 		private final String suiteName;
 		private final List<TestResult> testResults = Lists.newArrayList();
@@ -598,34 +561,13 @@ public class EmailableReport implements IReporter {
 			return suiteName;
 		}
 
-		/**
-		 * @return the test results (possibly empty)
-		 */
 		public List<TestResult> getTestResults() {
 			return testResults;
 		}
 	}
 
-	/**
-	 * Groups {@link ClassResult}s by test, type (configuration or test), and
-	 * status.
-	 */
 	protected static class TestResult {
-		/**
-		 * Orders test results by class name and then by method name (in lexicographic
-		 * order).
-		 */
-		protected static final Comparator<ITestResult> RESULT_COMPARATOR = new Comparator<ITestResult>() {
-			@Override
-			public int compare(ITestResult o1, ITestResult o2) {
-				int result = o1.getTestClass().getName().compareTo(o2.getTestClass().getName());
-				if (result == 0) {
-					result = o1.getMethod().getMethodName().compareTo(o2.getMethod().getMethodName());
-				}
-				return result;
-			}
-		};
-
+		protected static final Comparator<ITestResult> RESULT_COMPARATOR = null;
 		private final String testName;
 		private final List<ClassResult> failedConfigurationResults;
 		private final List<ClassResult> failedTestResults;
@@ -664,9 +606,6 @@ public class EmailableReport implements IReporter {
 			excludedGroups = formatGroups(context.getExcludedGroups());
 		}
 
-		/**
-		 * Groups test results by method and then by class.
-		 */
 		protected List<ClassResult> groupResults(Set<ITestResult> results) {
 			List<ClassResult> classResults = Lists.newArrayList();
 			if (!results.isEmpty()) {
@@ -723,37 +662,22 @@ public class EmailableReport implements IReporter {
 			return testName;
 		}
 
-		/**
-		 * @return the results for failed configurations (possibly empty)
-		 */
 		public List<ClassResult> getFailedConfigurationResults() {
 			return failedConfigurationResults;
 		}
 
-		/**
-		 * @return the results for failed tests (possibly empty)
-		 */
 		public List<ClassResult> getFailedTestResults() {
 			return failedTestResults;
 		}
 
-		/**
-		 * @return the results for skipped configurations (possibly empty)
-		 */
 		public List<ClassResult> getSkippedConfigurationResults() {
 			return skippedConfigurationResults;
 		}
 
-		/**
-		 * @return the results for skipped tests (possibly empty)
-		 */
 		public List<ClassResult> getSkippedTestResults() {
 			return skippedTestResults;
 		}
 
-		/**
-		 * @return the results for passed tests (possibly empty)
-		 */
 		public List<ClassResult> getPassedTestResults() {
 			return passedTestResults;
 		}
@@ -782,9 +706,6 @@ public class EmailableReport implements IReporter {
 			return excludedGroups;
 		}
 
-		/**
-		 * Formats an array of groups for display.
-		 */
 		protected String formatGroups(String[] groups) {
 			if (groups.length == 0) {
 				return "";
@@ -799,17 +720,10 @@ public class EmailableReport implements IReporter {
 		}
 	}
 
-	/**
-	 * Groups {@link MethodResult}s by class.
-	 */
 	protected static class ClassResult {
 		private final String className;
 		private final List<MethodResult> methodResults;
 
-		/**
-		 * @param className     the class name
-		 * @param methodResults the non-null, non-empty {@link MethodResult} list
-		 */
 		public ClassResult(String className, List<MethodResult> methodResults) {
 			this.className = className;
 			this.methodResults = methodResults;
@@ -819,53 +733,20 @@ public class EmailableReport implements IReporter {
 			return className;
 		}
 
-		/**
-		 * @return the non-null, non-empty {@link MethodResult} list
-		 */
 		public List<MethodResult> getMethodResults() {
 			return methodResults;
 		}
 	}
 
-	/**
-	 * Groups test results by method.
-	 */
 	protected static class MethodResult {
 		private final List<ITestResult> results;
 
-		/**
-		 * @param results the non-null, non-empty result list
-		 */
 		public MethodResult(List<ITestResult> results) {
 			this.results = results;
 		}
 
-		/**
-		 * @return the non-null, non-empty result list
-		 */
 		public List<ITestResult> getResults() {
 			return results;
 		}
 	}
-	
-	private static String getValueForKey(String key) {
-	    String value = System.getenv(key);
-	    if (value == null || value.isEmpty()) {
-	        try {
-	            java.lang.reflect.Field field = io.mosip.testrig.adminui.kernel.util.ConfigManager.class.getDeclaredField("propsKernel");
-	            field.setAccessible(true);
-	            Object props = field.get(null);
-	            if (props instanceof java.util.Properties) {
-	                value = ((java.util.Properties) props).getProperty(key);
-	            }
-	        } catch (Exception e) {
-	            value = "";
-	        }
-	    }
-
-	    return value;
-	}
-
-
-
 }
