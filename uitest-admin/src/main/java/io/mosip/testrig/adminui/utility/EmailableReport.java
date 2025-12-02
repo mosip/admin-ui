@@ -80,13 +80,13 @@ public class EmailableReport implements IReporter {
 		writer.close();
 
 		int totalTestCases = totalPassedTests + totalSkippedTests + totalFailedTests;
-		String oldString = System.getProperty("emailable.report2.name");
+		String oldString = System.getProperty("emailable.report2.name", fileName);
 		String temp = "-report_T-" + totalTestCases + "_P-" + totalPassedTests + "_S-" + totalSkippedTests + "_F-"
 				+ totalFailedTests;
 		String newString = oldString.replace("-report", temp);
 
-		File orignialReportFile = new File(System.getProperty("user.dir") + "/"
-				+ System.getProperty("testng.outpur.dir") + "/" + System.getProperty("emailable.report2.name"));
+		String reportDir = outputDirectory; // or System.getProperty("testng.output.dir")
+		File orignialReportFile = new File(reportDir, oldString);
 		logger.info("reportFile is::" + System.getProperty("user.dir") + "/" + System.getProperty("testng.outpur.dir")
 				+ "/" + System.getProperty("emailable.report2.name"));
 
@@ -103,7 +103,7 @@ public class EmailableReport implements IReporter {
 				if (ConfigManager.getPushReportsToS3().equalsIgnoreCase("yes")) {
 					S3Adapter s3Adapter = new S3Adapter();
 					boolean isStoreSuccess = false;
-					boolean isStoreSuccess2 = false;
+					boolean isStoreSuccess2 = true; // or remove this flag until a second upload is added
 					try {
 						isStoreSuccess = s3Adapter.putObject(ConfigManager.getS3Account(), "Adminui", null, null,
 								newString, newReportFile);
