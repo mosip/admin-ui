@@ -86,7 +86,7 @@ export class ViewComponent implements OnInit, OnDestroy {
   getUserConfigs() {
     let url = this.router.url.split('/')[3];
     if(url === "zoneuser"){
-      this.isUserMatMenu = true;
+      this.isUserMatMenu = false;
       this.dataStorageService
       .getSpecFileForMasterDataEntity("zoneuser")
       .subscribe(response => {
@@ -203,6 +203,10 @@ export class ViewComponent implements OnInit, OnDestroy {
                   );
                 }
               });
+            } else {
+              this.actionButtons = this.users.map(() => JSON.parse(JSON.stringify(this.userConfig.actionButtons.filter(
+                value => value.showIn.toLowerCase() === 'ellipsis'
+              ))));
             }
           } else {
             this.noData = true;
