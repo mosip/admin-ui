@@ -54,8 +54,7 @@ public class Commons extends BaseClass {
 			Commons.enter(driver, by, data, "Enter filter text");
 			wait(3000);
 			Commons.click(driver, By.id("applyTxt"), "Apply filter");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			Reporter.log("<p><img src='data:image/png;base64," + Screenshot.ClickScreenshot(driver)
 					+ "' width='900' height='450'/></p>");
 			logger.info(e.getMessage());
@@ -74,8 +73,7 @@ public class Commons extends BaseClass {
 			Commons.click(driver, By.id("Filter"), "Click Filter");
 			Commons.dropdowncenter(driver, by, data);
 			Commons.click(driver, By.id("applyTxt"), "Apply Filter");
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			Reporter.log("<p><img src='data:image/png;base64," + Screenshot.ClickScreenshot(driver)
 					+ "' width='900' height='450'/></p>");
 			logger.info(e.getMessage());
@@ -135,18 +133,42 @@ public class Commons extends BaseClass {
 	public static void enter(WebDriver driver, By by, String value) throws IOException {
 		enter(driver, by, value, "Entered text");
 	}
-	
+
+	public static void enterSensitive(WebDriver driver, By by, String value, String description) throws IOException {
+		logStep(description + " | Value → ****", by);
+		logger.info("Entering sensitive value into element " + by);
+
+		try {
+			driver.findElement(by).clear();
+			driver.findElement(by).sendKeys(value);
+		} catch (StaleElementReferenceException sere) {
+			Reporter.log("<p><img src='data:image/png;base64," + Screenshot.ClickScreenshot(driver)
+					+ "' width='900' height='450'/></p>");
+			driver.findElement(by).sendKeys(value);
+		} catch (TimeoutException toe) {
+			Reporter.log("<p><img src='data:image/png;base64," + Screenshot.ClickScreenshot(driver)
+					+ "' width='900' height='450'/></p>");
+			driver.findElement(by).sendKeys(value);
+			logger.info("Sensitive element " + by.toString() + " was not clickable after timeout");
+		} catch (Exception e) {
+			Reporter.log("<p><img src='data:image/png;base64," + Screenshot.ClickScreenshot(driver)
+					+ "' width='900' height='450'/></p>");
+			JavascriptExecutor executor = (JavascriptExecutor) driver;
+			executor.executeScript("arguments[0].click();", driver.findElement(by));
+		}
+	}
+
 	public static void dropdown(WebDriver driver, By by, String description) throws IOException {
 		logStep(description + " | Selected index 0", by);
 		logger.info("Selecting DropDown Index Zero Value " + by);
 		try {
 			wait(500);
-			click(driver, by,"Clicked dropdown to expand options");//REGION
+			click(driver, by, "Clicked dropdown to expand options");
 			wait(500);
 
 			String att = driver.findElement(by).getAttribute("aria-owns");
 			String[] list = att.split(" ");
-			click(driver, By.id(list[0]),"Clicked on first element from the list");
+			click(driver, By.id(list[0]), "Clicked on first element from the list");
 			wait(500);
 		} catch (Exception e) {
 			Reporter.log("<p><img src='data:image/png;base64," + Screenshot.ClickScreenshot(driver)
@@ -156,7 +178,7 @@ public class Commons extends BaseClass {
 		}
 	}
 
-	public static void dropdown(WebDriver driver, By by, String value, String description) {
+	public static void dropdown(WebDriver driver, By by, String value, String description) throws IOException {
 		logStep(description + " | Select dropdown using value: " + value, by);
 		logger.info("Selecting DropDown By Value " + by + value);
 
@@ -166,16 +188,18 @@ public class Commons extends BaseClass {
 			wait(500);
 
 			String val = "'" + value + "'";
-			click(driver, By.xpath("//span[contains(text()," + val + ")]"),"Selected value: " + value + " from the list");
+			click(driver, By.xpath("//span[contains(text()," + val + ")]"),
+					"Selected value: " + value + " from the list");
 			wait(500);
 		} catch (Exception e) {
-			logger.info(e.getMessage());
+			Reporter.log("<p><img src='data:image/png;base64," + Screenshot.ClickScreenshot(driver)
+					+ "' width='900' height='450'/></p>");
 			JavascriptExecutor executor = (JavascriptExecutor) driver;
 			executor.executeScript("arguments[0].click();", driver.findElement(by));
 		}
 	}
 
-	public static void dropdowncenter(WebDriver driver, By by, String value, String description) {
+	public static void dropdowncenter(WebDriver driver, By by, String value, String description) throws IOException {
 		logStep(description + " | Select dropdown center using value: " + value, by);
 		logger.info("Selecting DropDown By Value " + by + value);
 
@@ -185,15 +209,15 @@ public class Commons extends BaseClass {
 			wait(500);
 			click(driver, By.id(value), "Selected dropdown value with ID: " + value);
 			wait(500);
-
 		} catch (Exception e) {
-			logger.info(e.getMessage());
+			Reporter.log("<p><img src='data:image/png;base64," + Screenshot.ClickScreenshot(driver)
+					+ "' width='900' height='450'/></p>");
 			JavascriptExecutor executor = (JavascriptExecutor) driver;
 			executor.executeScript("arguments[0].click();", driver.findElement(by));
 		}
 	}
 
-	public static void dropdowncenter(WebDriver driver, By by, String value) {
+	public static void dropdowncenter(WebDriver driver, By by, String value) throws IOException {
 		dropdowncenter(driver, by, value, "Select dropdown center value");
 	}
 
@@ -202,12 +226,13 @@ public class Commons extends BaseClass {
 		logger.info("Selecting DropDown By Value " + by + value);
 		try {
 			wait(500);
-			click(driver, by,"Clicked on dropdown field to expand options");
+			click(driver, by, "Clicked on dropdown field to expand options");
 			wait(500);
-			click(driver, value,"Selected value from the dropdown");
+			click(driver, value, "Selected value from the dropdown");
 			wait(500);
 		} catch (Exception e) {
-			logger.info(e.getMessage());
+			Reporter.log("<p><img src='data:image/png;base64," + Screenshot.ClickScreenshot(driver)
+					+ "' width='900' height='450'/></p>");
 			JavascriptExecutor executor = (JavascriptExecutor) driver;
 			executor.executeScript("arguments[0].click();", driver.findElement(by));
 		}
@@ -263,8 +288,7 @@ public class Commons extends BaseClass {
 			Commons.click(driver, By.id("confirmmessagepopup"), "Clicked on Confirm Message popup after editing");
 
 			logger.info("Click Edit and Confirm " + by + data);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			logger.info(e.getMessage());
 			JavascriptExecutor executor = (JavascriptExecutor) driver;
 			executor.executeScript("arguments[0].click();", driver.findElement(by));
@@ -292,8 +316,7 @@ public class Commons extends BaseClass {
 				Commons.click(driver, By.id("confirmpopup"), "Clicked on Confirm popup if displayed");
 			Commons.click(driver, By.id("confirmmessagepopup"), "Clicked on Confirm Message popup after editing");
 			logger.info("Click Edit and Confirm " + by + data);
-		} 
-		catch (Exception e) {
+		} catch (Exception e) {
 			Reporter.log("<p><img src='data:image/png;base64," + Screenshot.ClickScreenshot(driver)
 					+ "' width='900' height='450'/></p>");
 			logger.info(e.getMessage());

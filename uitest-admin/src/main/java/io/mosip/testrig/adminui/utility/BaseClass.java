@@ -5,7 +5,6 @@ import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
@@ -99,7 +98,7 @@ public class BaseClass {
 		Commons.click(driver(), By.xpath(xpath), "Selected language: " + loginlang);
 
 		Commons.enter(driver(), By.id("username"), userid, "Entered username");
-		Commons.enter(driver(), By.id("password"), password, "Entered password");
+		Commons.enterSensitive(driver(), By.id("password"), password, "Entered password");
 		Commons.click(driver(), By.xpath("//input[@name='login']"), "Clicked login button");
 
 		if (AdminExtentReportManager.getTest() == null) {
