@@ -362,7 +362,7 @@ public class Commons extends BaseClass {
 	}
 
 	public static void createRes(WebDriver driver) throws IOException {
-		create(driver, "Create Resource");
+		createRes(driver, "Create Resource");
 	}
 
 	public static void decommission(WebDriver driver, String description) throws IOException {

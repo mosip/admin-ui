@@ -139,9 +139,15 @@ public class BaseClass {
 					logger.warn("Unable to capture screenshot in tearDown: " + e.getMessage());
 				}
 			} else if (result != null && result.getStatus() == ITestResult.SUCCESS) {
-				AdminExtentReportManager.getTest().pass("✅ Test Passed: " + result.getName());
+			    ExtentTest test = AdminExtentReportManager.getTest();
+			    if (test != null) {
+			        test.pass("✅ Test Passed: " + result.getName());
+			    }
 			} else if (result != null && result.getStatus() == ITestResult.SKIP) {
-				AdminExtentReportManager.getTest().skip("⚠️ Test Skipped: " + result.getName());
+			    ExtentTest test = AdminExtentReportManager.getTest();
+			    if (test != null) {
+			        test.skip("⚠️ Test Skipped: " + result.getName());
+			    }
 			}
 		} finally {
 			if (driverThread.get() != null) {

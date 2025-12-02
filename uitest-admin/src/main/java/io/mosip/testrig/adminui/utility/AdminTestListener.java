@@ -2,6 +2,9 @@ package io.mosip.testrig.adminui.utility;
 
 import org.testng.ITestListener;
 import org.testng.ITestResult;
+
+import com.aventstack.extentreports.ExtentTest;
+
 import org.testng.ITestContext;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -32,43 +35,34 @@ public class AdminTestListener implements ITestListener {
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        AdminExtentReportManager.logStep("🟩 Test Passed : " + result.getName());
-        AdminExtentReportManager.incrementPassed();
-        AdminExtentReportManager.getTest().pass("Test Passed Successfully!");
+        ExtentTest test = AdminExtentReportManager.getTest();
+        if (test != null) {
+            AdminExtentReportManager.logStep("🟩 Test Passed : " + result.getName());
+            AdminExtentReportManager.incrementPassed();
+            test.pass("Test Passed Successfully!");
+        }
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
-        String testName = result.getName();
-        AdminExtentReportManager.logStep("🟥 Test Failed : " + testName);
-
-        AdminExtentReportManager.incrementFailed();
-
-        try {
-            WebDriver driver = BaseClass.driver();
-            if (driver != null) {
-                byte[] screenshotBytes = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-                String base64Screenshot = java.util.Base64.getEncoder().encodeToString(screenshotBytes);
-
-                AdminExtentReportManager.attachScreenshotFromBase64(base64Screenshot,
-                        "Failure Screenshot - " + testName);
-            }
-        } catch (Exception e) {
-            AdminExtentReportManager.logStep("⚠️ Screenshot capture failed: " + e.getMessage());
-        }
-
-        if (AdminExtentReportManager.getTest() != null) {
-            AdminExtentReportManager.getTest().fail(result.getThrowable());
+        ExtentTest test = AdminExtentReportManager.getTest();
+        if (test != null) {
+            AdminExtentReportManager.logStep("🟥 Test Failed : " + result.getName());
+            AdminExtentReportManager.incrementFailed();
+            test.fail(result.getThrowable());
         }
     }
 
     @Override
     public void onTestSkipped(ITestResult result) {
-        AdminExtentReportManager.logStep("⚠️ Test Skipped : " + result.getName());
-        AdminExtentReportManager.incrementSkipped();
-        AdminExtentReportManager.getTest().skip("Skipped due to preconditions/Dependencies");
+        ExtentTest test = AdminExtentReportManager.getTest();
+        if (test != null) {
+            AdminExtentReportManager.logStep("⚠️ Test Skipped : " + result.getName());
+            AdminExtentReportManager.incrementSkipped();
+            test.skip("Skipped due to preconditions/Dependencies");
+        }
     }
-
+    
     @Override
     public void onFinish(ITestContext context) {
         AdminExtentReportManager.flushReport();
