@@ -2,6 +2,7 @@ package io.mosip.testrig.adminui.utility;
 
 import java.io.File;
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -78,7 +79,7 @@ public class BaseClass {
 		logger.info("Launch URL: " + envPath);
 		driver().manage().window().maximize();
 		Commons.wait(500);
-		driver().manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+		driver().manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
 
 		String language1 = ConfigManager.getloginlang();
 		String loginlang;
@@ -128,33 +129,19 @@ public class BaseClass {
 						byte[] screenshot = ((org.openqa.selenium.TakesScreenshot) drv)
 								.getScreenshotAs(org.openqa.selenium.OutputType.BYTES);
 						String base64 = java.util.Base64.getEncoder().encodeToString(screenshot);
-						ExtentTest test = AdminExtentReportManager.getTest();
-						if (test != null) {
-							test.fail("❌ Test Failed: " + result.getName());
-							test.fail(result.getThrowable());
-						}
-						AdminExtentReportManager.attachScreenshotFromBase64(base64, "Failure Screenshot");
+
+						AdminExtentReportManager.attachScreenshotFromBase64(base64,
+								"Failure Screenshot - " + result.getName());
 					}
 				} catch (Exception e) {
 					logger.warn("Unable to capture screenshot in tearDown: " + e.getMessage());
 				}
-			} else if (result != null && result.getStatus() == ITestResult.SUCCESS) {
-			    ExtentTest test = AdminExtentReportManager.getTest();
-			    if (test != null) {
-			        test.pass("✅ Test Passed: " + result.getName());
-			    }
-			} else if (result != null && result.getStatus() == ITestResult.SKIP) {
-			    ExtentTest test = AdminExtentReportManager.getTest();
-			    if (test != null) {
-			        test.skip("⚠️ Test Skipped: " + result.getName());
-			    }
 			}
 		} finally {
 			if (driverThread.get() != null) {
 				driverThread.get().quit();
 				driverThread.remove();
 			}
-			AdminExtentReportManager.flushReport();
 			AdminExtentReportManager.removeTest();
 		}
 	}
