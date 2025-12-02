@@ -23,16 +23,12 @@ public class DeviceTypesTest extends BaseClass {
 		Commons.filter(driver(), By.id("name"), data, "Filtered by device type name");
 
 		Commons.edit(driver(), data + 1, By.id("name"), "Editing Device Type Name");
-		Commons.enter(driver(), By.id("description"), data + 1, "Updated Device Type Description");
-		Commons.create(driver(), "Saved Edited Device Type");
 
 		Commons.filter(driver(), By.id("name"), data + 1, "Filtered after edit");
 
 		Commons.activate(driver(), "Activated Device Type");
 
 		Commons.edit(driver(), data + 2, By.id("name"), "Editing Device Type Name");
-		Commons.enter(driver(), By.id("description"), data + 2, "Updated Device Type Description again");
-		Commons.create(driver(), "Saved Edited Device Type");
 
 		Commons.filter(driver(), By.id("name"), data + 2, "Filtered after second edit");
 

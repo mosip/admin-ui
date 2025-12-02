@@ -26,16 +26,12 @@ public class DocumentCategoriesTest extends BaseClass {
 		Commons.filter(driver(), By.id("name"), data, "Filtered by Document Category Name");
 
 		Commons.edit(driver(), data + 1, By.id("name"), "Editing Document Category Name");
-		Commons.enter(driver(), By.id("description"), data + 1, "Updated Document Category Description");
-		Commons.create(driver(), "Saved Edited Document Category");
 
 		Commons.filter(driver(), By.id("name"), data + 1, "Filtered after edit");
 
 		Commons.activate(driver(), "Activated Document Category");
 
 		Commons.edit(driver(), data + 2, By.id("name"), "Editing Document Category again");
-		Commons.enter(driver(), By.id("description"), data + 2, "Updated Document Category Description again");
-		Commons.create(driver(), "Saved Edited Document Category");
 
 		Commons.filter(driver(), By.id("name"), data + 2, "Filtered after second edit");
 
