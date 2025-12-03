@@ -65,55 +65,68 @@ public class EmailableReport implements IReporter {
 		return fileName;
 	}
 
-	@Override
-	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDir) {
-		try (PrintWriter writer = createWriter(outputDir)) {
-			this.writer = writer;
-
-			for (ISuite suite : suites)
-				suiteResults.add(new SuiteResult(suite));
-
-			writeDocumentStart();
-			writeHead();
-			writeBody();
-			writeDocumentEnd();
+	public void generateReport(List<XmlSuite> xmlSuites, List<ISuite> suites, String outputDirectory) {
+		try {
+			writer = createWriter(outputDirectory);
 		} catch (IOException e) {
-			logger.error("Error creating TestNG report", e);
+			logger.error("Unable to create output file", e);
 			return;
 		}
-
-		// --- Prepare filename details ---
-		 String lang = ConfigManager.getValueForKey("loginlang");
-		if (lang == null || lang.isEmpty())
-			lang = "eng";
-
-		String date = java.time.LocalDateTime.now()
-				.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm"));
-
-		String env = "base-run";
-		try {
-			String envUser = ConfigManager.getiam_apienvuser();
-			if (envUser != null && !envUser.isEmpty())
-				env = envUser.replaceAll(".*?\\.([^\\.]+\\.[^\\.]+).*", "$1");
-		} catch (Exception ignored) {
+		for (ISuite suite : suites) {
+			suiteResults.add(new SuiteResult(suite));
 		}
+		writeDocumentStart();
+		writeHead();
+		writeBody();
+		writeDocumentEnd();
+		writer.close();
 
-		int total = totalPassedTests + totalSkippedTests + totalFailedTests;
+		int totalTestCases = totalPassedTests + totalSkippedTests + totalFailedTests;
+		String oldString = System.getProperty("emailable.report2.name", fileName);
+		String temp = "-report_T-" + totalTestCases + "_P-" + totalPassedTests + "_S-" + totalSkippedTests + "_F-"
+				+ totalFailedTests;
+		String newString = oldString.replace("-report", temp);
 
-		String newName = String.format("ADMINUI-%s-%s-%s-report_T-%d_P-%d_S-%d_F-%d.html", env, lang, date, total,
-				totalPassedTests, totalSkippedTests, totalFailedTests);
+		String reportDir = outputDirectory; // or System.getProperty("testng.output.dir")
+		File orignialReportFile = new File(reportDir, oldString);
+		logger.info("reportFile is::" + System.getProperty("user.dir") + "/" + System.getProperty("testng.outpur.dir")
+				+ "/" + System.getProperty("emailable.report2.name"));
 
-		// --- Rename file ---
-		File oldFile = new File(outputDir, fileName);
-		File newFile = new File(outputDir, newName);
-		if (oldFile.exists()) {
-			if (newFile.exists()) {
-				logger.warn("Target report file already exists: " + newName);
-			} else if (oldFile.renameTo(newFile)) {
-				logger.info("Report renamed to: " + newName);
+		File newReportFile = new File(
+				System.getProperty("user.dir") + "/" + System.getProperty("testng.outpur.dir") + "/" + newString);
+		logger.info("New reportFile is::" + System.getProperty("user.dir") + "/"
+				+ System.getProperty("testng.outpur.dir") + "/" + newString);
+
+		if (orignialReportFile.exists()) {
+			if (orignialReportFile.renameTo(newReportFile)) {
+				orignialReportFile.delete();
+				logger.info("Report File re-named successfully!");
+
+				if (ConfigManager.getPushReportsToS3().equalsIgnoreCase("yes")) {
+					S3Adapter s3Adapter = new S3Adapter();
+					boolean isStoreSuccess = false;
+					boolean isStoreSuccess2 = true; // or remove this flag until a second upload is added
+					try {
+						isStoreSuccess = s3Adapter.putObject(ConfigManager.getS3Account(), "Adminui", null, null,
+								newString, newReportFile);
+						logger.info("isStoreSuccess:: " + isStoreSuccess);
+
+						/* Need to figure how to handle EXTENT report handling */
+
+					} catch (Exception e) {
+						logger.error("error occured while pushing the object" + e.getMessage());
+					}
+					if (isStoreSuccess && isStoreSuccess2) {
+						logger.info("Pushed report to S3");
+					} else {
+						logger.error("Failed while pushing file to S3");
+					}
+				}
 			} else {
-				logger.error("Failed to rename report to: " + newName);
+				logger.error("Renamed report file doesn't exist");
 			}
+		} else {
+			logger.error("Original report File does not exist!");
 		}
 	}
 
