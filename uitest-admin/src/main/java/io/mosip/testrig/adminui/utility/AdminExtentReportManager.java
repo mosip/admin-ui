@@ -1,6 +1,7 @@
 package io.mosip.testrig.adminui.utility;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -15,6 +16,8 @@ import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.aventstack.extentreports.reporter.configuration.Theme;
 
 import io.mosip.testrig.adminui.kernel.util.ConfigManager;
+import io.mosip.testrig.adminui.kernel.util.S3Adapter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +35,7 @@ public class AdminExtentReportManager {
 	private static int passedCount = 0;
 	private static int failedCount = 0;
 	private static int skippedCount = 0;
+	private static String reportPath;
 
 	public synchronized static void initReport() {
 		if (extent == null) {
@@ -42,7 +46,7 @@ public class AdminExtentReportManager {
 					+ safeEnvName() + " ---- Branch: " + gitBranch + " & Commit: " + gitCommitId;
 
 			String timestamp = new SimpleDateFormat("yyyy-MMM-dd_HH-mm").format(new Date()).toLowerCase();
-			String reportPath = "test-output/AdminReport_" + timestamp + ".html";
+			reportPath = "test-output/AdminReport_" + timestamp + ".html";
 
 			ExtentSparkReporter spark = new ExtentSparkReporter(reportPath);
 			spark.config().setTheme(Theme.DARK);
@@ -226,8 +230,42 @@ public class AdminExtentReportManager {
 	}
 
 	public static synchronized void flushReport() {
-		if (extent != null) {
-			extent.flush();
-		}
+	    if (extent != null) {
+	        extent.flush();
+	        LOGGER.info("Extent report flushed successfully.");
+
+	        try {
+	        	pushReportToS3(reportPath);
+	        } catch (Exception e) {
+	            LOGGER.error("Error while uploading report: ", e);
+	        }
+	    }
 	}
+	
+	public static synchronized void pushReportToS3(String reportFilePath) {
+	    if (ConfigManager.getPushReportsToS3().equalsIgnoreCase("yes")) {
+	        S3Adapter s3Adapter = new S3Adapter();
+	        File reportFile = new File(reportFilePath);
+	        boolean isStoreSuccess = false;
+	        try {
+	            isStoreSuccess = s3Adapter.putObject(
+	                    ConfigManager.getS3Account(), 
+	                    "Adminui", 
+	                    null, 
+	                    null, 
+	                    reportFile.getName(), 
+	                    reportFile
+	            );
+	            if (isStoreSuccess) {
+	            	LOGGER.info("Admin Extent report successfully pushed to S3/MinIO: {} "+reportFile.getName());
+	            } else {
+	            	LOGGER.error("Failed to push Admin Extent report to S3/MinIO: { } "+ reportFile.getName());
+	            }
+	        } catch (Exception e) {
+	        	LOGGER.error("Exception while pushing Admin Extent report to S3/MinIO: {} "+e.getMessage());
+	        }
+	    }
+	}
+
+
 }
