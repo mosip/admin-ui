@@ -1,5 +1,5 @@
 # Start with a base image that includes Java 21
-FROM eclipse-temurin:21-jdk
+FROM abhishek8shankar/uitest-admin:develop
 
 # Install additional dependencies, such as Selenium, Chrome, and kubectl
 USER root
