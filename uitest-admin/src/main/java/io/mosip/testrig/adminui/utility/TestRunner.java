@@ -155,7 +155,7 @@ public class TestRunner {
 
 		}
 		// Set other properties and run TestNG
-		System.getProperties().setProperty("testng.outpur.dir", "testng-report");
+		System.getProperties().setProperty("testng.output.dir", "testng-report");
 		runner.setOutputDirectory("testng-report");
 		System.getProperties().setProperty("emailable.report2.name",
 				"ADMINUI-" + BaseTestCaseFunc.environment + "-run-" + System.currentTimeMillis() + "-report.html");
