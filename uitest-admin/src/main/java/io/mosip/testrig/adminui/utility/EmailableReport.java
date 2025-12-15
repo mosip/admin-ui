@@ -98,15 +98,10 @@ public class EmailableReport implements IReporter {
 				+ totalFailedTests + "_KI-" + totalKnownIssues;
 		String newString = oldString.replace("-report", temp);
 
-		String reportDir = outputDirectory; // or System.getProperty("testng.output.dir")
-		File orignialReportFile = new File(reportDir, oldString);
-		logger.info("reportFile is::" + System.getProperty("user.dir") + "/" + System.getProperty("testng.output.dir")
-				+ "/" + System.getProperty("emailable.report2.name"));
-
-		File newReportFile = new File(
-				System.getProperty("user.dir") + "/" + System.getProperty("testng.output.dir") + "/" + newString);
-		logger.info("New reportFile is::" + System.getProperty("user.dir") + "/"
-				+ System.getProperty("testng.output.dir") + "/" + newString);
+		File orignialReportFile = new File(outputDirectory, oldString);
+		File newReportFile = new File(outputDirectory, newString);
+		logger.info("reportFile is::" + orignialReportFile.getAbsolutePath());
+		logger.info("New reportFile is::" + newReportFile.getAbsolutePath());
 
 		if (orignialReportFile.exists()) {
 			if (orignialReportFile.renameTo(newReportFile)) {
@@ -115,8 +110,7 @@ public class EmailableReport implements IReporter {
 
 				if (ConfigManager.getPushReportsToS3().equalsIgnoreCase("yes")) {
 					S3Adapter s3Adapter = new S3Adapter();
-					boolean isStoreSuccess = false;
-					boolean isStoreSuccess2 = true; // or remove this flag until a second upload is added
+					boolean isStoreSuccess = false; // or remove this flag until a second upload is added
 					try {
 						isStoreSuccess = s3Adapter.putObject(ConfigManager.getS3Account(), "Adminui", null, null,
 								newString, newReportFile);
@@ -127,7 +121,7 @@ public class EmailableReport implements IReporter {
 					} catch (Exception e) {
 						logger.error("error occured while pushing the object" + e.getMessage());
 					}
-					if (isStoreSuccess && isStoreSuccess2) {
+					if (isStoreSuccess) {
 						logger.info("Pushed report to S3");
 					} else {
 						logger.error("Failed while pushing file to S3");
