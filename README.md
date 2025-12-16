@@ -1,12 +1,27 @@
 # Admin Portal
-[![Maven Package upon a push](https://github.com/mosip/keymanager/actions/workflows/push_trigger.yml/badge.svg?branch=release-1.2.0.1)](https://github.com/mosip/admin-ui/actions/workflows/push_trigger.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?branch=release-1.2.0.1&project=mosip_admin-ui&metric=alert_status)](https://sonarcloud.io/dashboard?branch=release-1.2.0.1&id=mosip_admin-ui)
+[![admin-ui build upon a push](https://github.com/mosip/admin-ui/actions/workflows/push-trigger.yml/badge.svg?branch=release-1.3.x)](https://github.com/mosip/admin-ui/actions/workflows/push-trigger.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?branch=release-1.3.x&project=mosip_admin-ui&metric=alert_status)](https://sonarcloud.io/dashboard?branch=release-1.3.x&id=mosip_admin-ui)
 
 ## Overview
-See [overview and portal user guide](https://docs.mosip.io/1.2.0/modules/administration/admin-portal-user-guide).
+An admin application is a web-based application used by a privileged group of administrative personnel to manage various master data sets. The various resources that an Admin can manage are:
+
+* Center (Registration centers)
+* Device
+* Machine
+* Users (Admin, Registration staff)
+
+Along with the resource and data management, the admin can generate master keys, check registration status, retrieve lost RID, and resume processing of paused packets. To start using the Admin portal, an admin user must be assigned to a zone.
+ Refer [overview and portal user guide](https://docs.mosip.io/1.2.0/modules/administration/admin-portal-user-guide).
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.0.3.
 
+### Local Setup (for Development or Contribution)
+The project can be set up in two ways:
+
+1. [Local Setup (for Development or Contribution)](#local-setup-for-development-or-contribution)
+2. [Local Setup with Docker (Easy Setup for Demos)](#local-setup-with-docker-easy-setup-for-demos)
+
+### Local Setup (for Development or Contribution)
 ## Development server
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
@@ -27,7 +42,44 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
 
-## Deployment in K8 cluster with other MOSIP services:
+### Local Setup with Docker (Easy Setup for Demos)
+#### Option 2: Build Docker Images Locally
+
+Recommended for contributors or developers who want to modify or build the services from source.
+
+1. Clone and build the project:
+
+```text
+git clone <repo-url>
+```
+```text
+cd admin-ui
+```
+2. Navigate to each service directory and build the Docker image:
+```text
+cd admin-ui/<service-directory>
+```
+```text
+docker build -t <service-name> .
+```
+#### Running the Services
+
+Start each service using Docker:
+
+```text
+docker run -d -p <port>:<port> --name <service-name> <service-name>
+```
+#### Verify Installation
+
+Check that all containers are running:
+
+```text
+docker ps
+```
+Access the services at `http://localhost:<port>` using the port mappings listed above.
+
+## Deployment
+### Kubernetes
 ### Pre-requisites
 * Set KUBECONFIG variable to point to existing K8 cluster kubeconfig file:
     * ```
@@ -48,11 +100,19 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
     $ cd deploy
     $ ./restart.sh
    ```
-
+### Product Documentation
+To learn more about admin services from a functional perspective and use case scenarios, refer to our main documentation: [Click here](https://docs.mosip.io/1.2.0/id-lifecycle-management/support-systems/administration).
 
 ## Further help 
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
 
+## Contribution & Community
+
+* To learn how you can contribute code to this application, [click here](https://docs.mosip.io/1.2.0/community/code-contributions).
+
+* If you have questions or encounter issues, visit the [MOSIP Community](https://community.mosip.io/) for support.
+* For any GitHub issues: [Report here](https://github.com/mosip/admin-ui/issues)
+
 ## License
-This project is licensed under the terms of [Mozilla Public License 2.0](../LICENSE).
+This project is licensed under the terms of [Mozilla Public License 2.0](LICENSE)
