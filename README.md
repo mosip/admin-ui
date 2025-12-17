@@ -110,5 +110,7 @@ To learn more about admin services from a functional perspective and use case sc
 * If you have questions or encounter issues, visit the [MOSIP Community](https://community.mosip.io/) for support.
 * For any GitHub issues: [Report here](https://github.com/mosip/admin-ui/issues)
 
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.0.3.
+
 ## License
 This project is licensed under the terms of [Mozilla Public License 2.0](LICENSE)
