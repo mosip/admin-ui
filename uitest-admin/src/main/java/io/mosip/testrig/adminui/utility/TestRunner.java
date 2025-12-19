@@ -51,8 +51,8 @@ public class TestRunner {
 					continue;
 				}
 
-				String[] parts = line.split("------");
-				if (parts.length == 2) {
+				String[] parts = line.split("------", 2);
+				if (parts.length == 2 && !parts[0].trim().isEmpty() && !parts[1].trim().isEmpty()) {
 					String bugId = parts[0].trim();
 					String testCaseName = parts[1].trim();
 

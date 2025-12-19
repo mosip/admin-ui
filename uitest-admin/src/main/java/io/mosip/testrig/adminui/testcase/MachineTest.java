@@ -2,6 +2,7 @@ package io.mosip.testrig.adminui.testcase;
 
 import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.testng.annotations.Test;
 import io.mosip.testrig.adminui.kernel.util.ConfigManager;
 import io.mosip.testrig.adminui.utility.BaseClass;
@@ -33,7 +34,7 @@ public class MachineTest extends BaseClass {
 
 		try {
 		    Commons.dropdown(driver(), By.id("zone"), "Selected Zone");
-		} catch (Exception e) {
+		} catch (NoSuchElementException  e) {
 		    logger.info("Zone dropdown not available");
 		}
 
