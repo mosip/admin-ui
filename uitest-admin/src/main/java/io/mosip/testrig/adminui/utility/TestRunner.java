@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.testng.TestListenerAdapter;
@@ -32,7 +34,7 @@ public class TestRunner {
 	public static String temporaryVid = "";
 
 	static TestNG testNg;
-	public static List<String> knownIssues = new ArrayList<>();
+	public static Map<String, String> knownIssues = new HashMap<>();
 
 	public static void main(String[] args) throws Exception {
 
@@ -41,13 +43,26 @@ public class TestRunner {
 
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(
 				new FileInputStream(getResourcePath() + "/config/Known_Issues.txt"), StandardCharsets.UTF_8))) {
+
 			String line;
 			while ((line = br.readLine()) != null) {
-				if (!line.trim().isEmpty()) {
-					knownIssues.add(line.trim());
+				line = line.trim();
+
+				if (line.isEmpty() || line.startsWith("#") || !line.contains("------")) {
+					continue;
+				}
+
+				String[] parts = line.split("------");
+				if (parts.length == 2) {
+					String bugId = parts[0].trim();
+					String testCaseName = parts[1].trim();
+
+					knownIssues.put(testCaseName, bugId);
 				}
 			}
+
 			logger.info("Known Issues Loaded: " + knownIssues);
+
 		} catch (Exception e) {
 			logger.warn("Known_Issues.txt not found or unreadable: " + e.getMessage());
 		}

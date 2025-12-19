@@ -635,7 +635,7 @@ public class EmailableReport implements IReporter {
 		List<ITestResult> filtered = new ArrayList<>();
 
 		for (ITestResult r : resultsSet) {
-			if (TestRunner.knownIssues.contains(r.getName())) {
+			if (TestRunner.knownIssues.containsKey(r.getName())) {
 				filtered.add(r);
 			}
 		}

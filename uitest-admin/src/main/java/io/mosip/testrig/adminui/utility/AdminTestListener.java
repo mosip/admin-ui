@@ -15,6 +15,7 @@ import io.mosip.testrig.adminui.kernel.util.ConfigManager;
 
 public class AdminTestListener implements ITestListener {
 	static Logger logger = Logger.getLogger(EmailableReport.class);
+	private static final String BUG_BASE_URL = "https://mosip.atlassian.net/browse/";
 
 	@Override
 	public void onStart(ITestContext context) {
@@ -61,19 +62,29 @@ public class AdminTestListener implements ITestListener {
 	@Override
 	public void onTestSkipped(ITestResult result) {
 		ExtentTest test = AdminExtentReportManager.getTest();
-		if (test != null) {
-			if (TestRunner.knownIssues.contains(result.getName())) {
-				AdminExtentReportManager.logStep("🟠 Known Issue : " + result.getName());
-				AdminExtentReportManager.incrementKnownIssue();
-				test.skip("Marked as Known Issue");
+		if (test == null)
+			return;
 
-			} else {
+		String testName = result.getName();
 
-				AdminExtentReportManager.logStep("⚠️ Test Skipped : " + result.getName());
-				AdminExtentReportManager.incrementSkipped();
-				test.skip("Skipped due to preconditions/Dependencies");
+		if (TestRunner.knownIssues.containsKey(testName)) {
 
-			}
+			String bugId = TestRunner.knownIssues.get(testName);
+			String bugUrl = BUG_BASE_URL + bugId;
+
+			AdminExtentReportManager.incrementKnownIssue();
+
+			String message = "🟠 Test skipped due to a known issue.<br/>" + "Refer to Bug ID: <a href='" + bugUrl
+					+ "' target='_blank'>" + bugId + "</a>";
+
+			test.skip(message);
+			AdminExtentReportManager.logStep("Test is Marked as Known Issue: " + bugId);
+
+		} else {
+
+			AdminExtentReportManager.incrementSkipped();
+			test.skip("⚠️ Test Skipped due to preconditions / dependencies");
+			AdminExtentReportManager.logStep("⚠️ Test Skipped : " + testName);
 		}
 	}
 

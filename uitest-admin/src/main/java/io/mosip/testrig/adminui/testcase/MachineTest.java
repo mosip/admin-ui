@@ -1,12 +1,15 @@
 package io.mosip.testrig.adminui.testcase;
 
+import org.apache.log4j.Logger;
 import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 import io.mosip.testrig.adminui.kernel.util.ConfigManager;
 import io.mosip.testrig.adminui.utility.BaseClass;
+import io.mosip.testrig.adminui.utility.BaseTestCaseFunc;
 import io.mosip.testrig.adminui.utility.Commons;
 
 public class MachineTest extends BaseClass {
+	protected static Logger logger = Logger.getLogger(MachineTest.class);
 
 	@Test
 	public void machineCRUD() throws Exception {
@@ -30,8 +33,9 @@ public class MachineTest extends BaseClass {
 		Commons.enter(driver(), By.id("signPublicKey"), signPublicKey, "Entered Sign Public Key");
 
 		try {
-			Commons.dropdown(driver(), By.id("zone"), "Selected Zone");
+		    Commons.dropdown(driver(), By.id("zone"), "Selected Zone");
 		} catch (Exception e) {
+		    logger.info("Zone dropdown not available");
 		}
 
 		Commons.dropdown(driver(), By.id("regCenterId"), "Selected Registration Center");
