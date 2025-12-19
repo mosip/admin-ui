@@ -5,7 +5,6 @@ import org.openqa.selenium.By;
 import org.testng.annotations.Test;
 import io.mosip.testrig.adminui.kernel.util.ConfigManager;
 import io.mosip.testrig.adminui.utility.BaseClass;
-import io.mosip.testrig.adminui.utility.BaseTestCaseFunc;
 import io.mosip.testrig.adminui.utility.Commons;
 
 public class MachineTest extends BaseClass {

@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import io.mosip.testrig.adminui.kernel.util.ConfigManager;
 
 public class AdminTestListener implements ITestListener {
-	static Logger logger = Logger.getLogger(EmailableReport.class);
+	static Logger logger = Logger.getLogger(AdminTestListener.class);
 	private static final String BUG_BASE_URL = "https://mosip.atlassian.net/browse/";
 
 	@Override

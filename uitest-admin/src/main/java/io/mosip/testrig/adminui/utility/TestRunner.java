@@ -2,7 +2,6 @@ package io.mosip.testrig.adminui.utility;
 
 import java.io.File;
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
