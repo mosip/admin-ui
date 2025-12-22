@@ -4,4 +4,4 @@ modules:
     image:
       registry: docker.io
       repository: mosipid/uitest-admin
-      tag: 1.3.0-beta.1
+      tag: 1.3.0
