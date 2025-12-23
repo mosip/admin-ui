@@ -1,6 +1,6 @@
 # Admin Portal
-[![admin-ui build upon a push](https://github.com/mosip/admin-ui/actions/workflows/push-trigger.yml/badge.svg?branch=release-1.3.x)](https://github.com/mosip/admin-ui/actions/workflows/push-trigger.yml)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?branch=release-1.3.x&project=mosip_admin-ui&metric=alert_status)](https://sonarcloud.io/dashboard?branch=release-1.3.x&id=mosip_admin-ui)
+[![admin-ui build upon a push](https://github.com/mosip/admin-ui/actions/workflows/push-trigger.yml/badge.svg?branch=master)](https://github.com/mosip/admin-ui/actions/workflows/push-trigger.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?branch=master)](https://sonarcloud.io/dashboard?branch=master)
 
 ## Overview
 An admin application is a web-based application used by a privileged group of administrative personnel to manage various master data sets. The various resources that an Admin can manage are:
