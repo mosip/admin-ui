@@ -142,6 +142,10 @@ export class CreateComponent {
   }
 
   submit(){
+    if (this.uploadForm.invalid) {
+    this.uploadForm.markAllAsTouched();
+    return;
+    }
     if (this.uploadForm.valid) {
       this.auditService.audit(24, 'ADM-333', 'Master Data Upload Form');
       let data = {};
