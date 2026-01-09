@@ -796,7 +796,7 @@
                 "required": "ಅட்டಿಯ ಹೆಸರು ಅಗತ್ಯ"
             },
             "file": {
-                "required": "파일್ ಅಗತ್ಯ"
+                "required": "ಫೈಲ್ ಅಗತ್ಯವಿದೆ"
             }
         },
 		"popupMessages": {
