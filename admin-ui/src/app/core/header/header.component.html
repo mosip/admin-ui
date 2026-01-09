@@ -8,17 +8,21 @@
     </button>
   </div>
   <div class="mosip-logo">
-    <span
-      ><img
-        src="./assets/images/logo-final.png"
-        width="45"
-        height="45"
-        alt="Logo"/></span
-    >&nbsp;
-    <span [ngStyle]="{ display: screenResize > 840 ? 'inline-block' : 'none' }"
-      ><strong class="mosip-text">MOSIP</strong
-      ><strong class="version-txt"> {{ 'headermessage.vesion' | translate }} : {{ appVersion }}</strong></span
-    >
+    <span>
+        <img *ngIf="(screenResize > 840) || (screenResize <= 470)"
+             src="./assets/images/mosip-logo-picto.png"
+             style="max-height: 2.82rem; width: fit-content;"
+             alt="Logo"/>
+        <img *ngIf="(screenResize <= 840 && screenResize > 470)"
+             src="./assets/images/mosip-logo-white.png"
+             style="height: 2.82rem; width: fit-content;"
+             alt="Logo"/>
+    </span>
+    &nbsp;
+    <span [ngStyle]="{ display: screenResize > 840 ? 'inline-block' : 'none' }">
+        <strong class="mosip-text">MOSIP</strong>
+        <strong class="version-txt"> {{ 'headermessage.vesion' | translate }} : {{ appVersion }}</strong>
+    </span>
   </div>
   <div class="zone">
     <span class="zone-text">{{ 'headermessage.Zone' | translate }} - {{ zone }}</span>
