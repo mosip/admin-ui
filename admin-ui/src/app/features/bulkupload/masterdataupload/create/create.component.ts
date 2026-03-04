@@ -145,11 +145,12 @@ export class CreateComponent {
     return;
     }
     this.auditService.audit(24, 'ADM-333', 'Master Data Upload Form');
-    let data = {};
-    data = {
+    const operationValue = this.uploadForm.get('operation') ? this.uploadForm.get('operation').value : '';
+    const tableNameValue = this.uploadForm.get('tableName') ? this.uploadForm.get('tableName').value : '';
+    const data = {
       case: 'CONFIRMATION',
       title: this.popupMessages['popup1'].title,
-      message: this.popupMessages['popup1'].message[0] + this.uploadForm.get('operation').value + this.popupMessages['popup1'].message[1] + this.uploadForm.get('tableName').value + this.popupMessages['popup1'].message[2],
+      message: this.popupMessages['popup1'].message[0] + operationValue + this.popupMessages['popup1'].message[1] + tableNameValue + this.popupMessages['popup1'].message[2],
       yesBtnTxt: this.popupMessages['popup1'].yesBtnText,
       noBtnTxt: this.popupMessages['popup1'].noBtnText
     };
