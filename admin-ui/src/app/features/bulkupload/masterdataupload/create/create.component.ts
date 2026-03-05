@@ -24,7 +24,6 @@ export class CreateComponent {
   labelanddatas:any;
   subscribed: any;
   popupMessages:any;
-  fileNameError:boolean = false;
   buttonalignment = 'ltr';
   serverError:any;
   tableName: string;
@@ -132,7 +131,6 @@ export class CreateComponent {
       this.uploadForm.get('files').setValue(file);
       this.uploadForm.get('fileName').setValue(file.name);
       //document.getElementById("fileName").classList.remove('addredborder');
-      this.fileNameError = false;
     }
   }
 
@@ -142,43 +140,30 @@ export class CreateComponent {
   }
 
   submit(){
-    if (this.uploadForm.valid) {
-      this.auditService.audit(24, 'ADM-333', 'Master Data Upload Form');
-      let data = {};
-      data = {
-        case: 'CONFIRMATION',       
-        title: this.popupMessages['popup1'].title,
-        message: this.popupMessages['popup1'].message[0] + this.uploadForm.get('operation').value + this.popupMessages['popup1'].message[1] + this.uploadForm.get('tableName').value + this.popupMessages['popup1'].message[2],
-        yesBtnTxt: this.popupMessages['popup1'].yesBtnText,
-        noBtnTxt: this.popupMessages['popup1'].noBtnText
-      };
-      const dialogRef = this.dialog.open(DialogComponent, {
-        width: '650px',
-        data
-      });
-      dialogRef.afterClosed().subscribe(response => {   
-        if(response){
-          this.auditService.audit(18, 'ADM-334', 'Master Data Upload Form');
-          this.saveData();
-        }      
-      });  
-    } else {
-      for (const i in this.uploadForm.controls) {
-        if (this.uploadForm.controls[i]) {
-          if(i === "fileName"){
-            if(!this.uploadForm.get('fileName').value){
-              document.getElementById("fileName").classList.add('addredborder');
-              this.fileNameError = true;
-            }else{
-              console.log("this.uploadForm.get('fileName').value>>>"+this.uploadForm.get('fileName').value);
-            }
-          }else{
-            this.uploadForm.controls[i].markAsTouched();
-          }
-          
-        }
+    if (this.uploadForm.invalid) {
+    this.uploadForm.markAllAsTouched();
+    return;
+    }
+    this.auditService.audit(24, 'ADM-333', 'Master Data Upload Form');
+    const operationValue = this.uploadForm.get('operation') ? this.uploadForm.get('operation').value : '';
+    const tableNameValue = this.uploadForm.get('tableName') ? this.uploadForm.get('tableName').value : '';
+    const data = {
+      case: 'CONFIRMATION',
+      title: this.popupMessages['popup1'].title,
+      message: this.popupMessages['popup1'].message[0] + operationValue + this.popupMessages['popup1'].message[1] + tableNameValue + this.popupMessages['popup1'].message[2],
+      yesBtnTxt: this.popupMessages['popup1'].yesBtnText,
+      noBtnTxt: this.popupMessages['popup1'].noBtnText
+    };
+    const dialogRef = this.dialog.open(DialogComponent, {
+      width: '650px',
+      data
+    });
+    dialogRef.afterClosed().subscribe(response => {
+      if(response){
+        this.auditService.audit(18, 'ADM-334', 'Master Data Upload Form');
+        this.saveData();
       }
-    }  
+    });
   }
 
   saveData(){
