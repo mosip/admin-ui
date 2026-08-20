@@ -23,7 +23,7 @@ export class LogoutService {
 
   logout() {
     //TODO: NEED TO CHECK THE IMPLEMENTATION LATER
-   let url = `${this.appService.getConfig().baseUrl}${this.appService.getConfig().logout}?redirecturi=${btoa(window.location.href)}`;
+   let url = `${this.appService.getConfig().baseUrl}${this.appService.getConfig().logout}?redirecturi=`+encodeURIComponent(window.location.href);
      window.location.href = url;
   }
 }
