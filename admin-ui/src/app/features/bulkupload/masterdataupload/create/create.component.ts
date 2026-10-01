@@ -142,6 +142,7 @@ export class CreateComponent {
   submit(){
     if (this.uploadForm.invalid) {
     this.uploadForm.markAllAsTouched();
+    this.focusFirstInvalidField();
     return;
     }
     this.auditService.audit(24, 'ADM-333', 'Master Data Upload Form');
@@ -164,6 +165,16 @@ export class CreateComponent {
         this.saveData();
       }
     });
+  }
+
+  // Move focus to the first field with an error so keyboard and screen reader users land on it
+  focusFirstInvalidField() {
+    const fieldElementIds = { operation: 'operation', tableName: 'tableName', fileName: 'fileInput' };
+    const firstInvalidField = Object.keys(fieldElementIds).find(field => this.uploadForm.get(field).invalid);
+    const element = firstInvalidField ? document.getElementById(fieldElementIds[firstInvalidField]) : null;
+    if (element) {
+      element.focus();
+    }
   }
 
   saveData(){

@@ -15,7 +15,7 @@
     <div id="myDiv" class="flex-body">
       <mat-card>
         <mat-card-content class="forms-container">
-          <div [formGroup]="uploadForm" class="primary-form" *ngIf="uploadForm">
+          <div [formGroup]="uploadForm" class="primary-form masterdata-upload-form" *ngIf="uploadForm">
             <mat-form-field>
               <mat-label>{{labelanddatas.operation | translate }}</mat-label>
               <mat-select
@@ -49,8 +49,8 @@
                   {{'bulkUpload.validationMessages.tableName.required' | translate}}
                 </mat-error>
               </mat-form-field>                
-              <mat-label style="width:2%" *ngIf="showDownloadBtn" (click)="downloadCSV()" (keypress)="downloadCSV()"><img src="assets/images/download-csv.png" alt="Download CSV" height="18px" width="18px" style="cursor:pointer;" /></mat-label>
-              <mat-label style="width:2%" *ngIf="showDownloadBtn" (click)="downloadExcel()" (keypress)="downloadExcel()"><img src="assets/images/download-excel.png" alt="Download Excel" height="18px" width="18px" style="cursor:pointer;" /></mat-label>
+              <mat-label style="width:2%" *ngIf="showDownloadBtn" role="button" tabindex="0" (click)="downloadCSV()" (keydown.enter)="$event.preventDefault(); downloadCSV()" (keydown.space)="$event.preventDefault(); downloadCSV()"><img src="assets/images/download-csv.png" alt="Download CSV" height="18px" width="18px" style="cursor:pointer;" /></mat-label>
+              <mat-label style="width:2%" *ngIf="showDownloadBtn" role="button" tabindex="0" (click)="downloadExcel()" (keydown.enter)="$event.preventDefault(); downloadExcel()" (keydown.space)="$event.preventDefault(); downloadExcel()"><img src="assets/images/download-excel.png" alt="Download Excel" height="18px" width="18px" style="cursor:pointer;" /></mat-label>
             </div>
             <!-- <div class="custom-file-input">    
               <input type="button" *ngIf="buttonalignment === 'rtl'" value="{{labelanddatas.chooseFile | translate }}" class="browseInput">           
@@ -62,12 +62,14 @@
                 {{'genericerror.fieldValidation' | translate}}
               </mat-error>  
             </div> -->     
-            <label class="labelfileupload" for="fileInput" [style.color]="uploadForm.controls.fileName.touched && uploadForm.controls.fileName.hasError('required') ? 'red' : 'rgba(0, 0, 0, 0.54)'">{{'uploadcertificate.uploadYourFile' | translate}} <span style="color:red;">*</span></label>
+            <label class="labelfileupload" for="fileInput" [style.color]="uploadForm.controls.fileName.touched && uploadForm.controls.fileName.hasError('required') ? 'red' : 'rgba(0, 0, 0, 0.54)'">{{'uploadcertificate.uploadYourFile' | translate}} <span style="color:red;" aria-hidden="true">*</span></label>
               <div class="fileuploadcontainer" appDnd (fileDropped)="onFileDropped($event)" id="fileName">
-              <mat-error  *ngIf="uploadForm.controls.fileName.touched && uploadForm.controls.fileName.hasError('required')">{{ 'bulkUpload.validationMessages.file.required' | translate }}</mat-error>
-              <input (click)="$event.target.value=null" type="file" accept=".xlsx, .xls, .csv" #fileInput id="fileInput" (change)="onFileSelect($event)"/>
+              <input (click)="$event.target.value=null" type="file" accept=".xlsx, .xls, .csv" #fileInput id="fileInput" (change)="onFileSelect($event)"
+                aria-required="true"
+                [attr.aria-invalid]="uploadForm.controls.fileName.touched && uploadForm.controls.fileName.invalid"
+                [attr.aria-describedby]="uploadForm.controls.fileName.touched && uploadForm.controls.fileName.hasError('required') ? 'fileInputError' : null"/>
               <label style="margin-right: 1rem;display: flex;" for="fileInput">
-                <svg id="upload_icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24.042"
+                <svg id="upload_icon" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="24" height="24.042"
                   viewBox="0 0 24 24.042">
                   <g id="Group_13" data-name="Group 13" transform="translate(3 2.504)">
                     <path id="Path_988" data-name="Path 988"
@@ -81,11 +83,12 @@
                 </svg>
                 <span style="margin-top: 4px;padding-left: 5px; font-size: 14px; font-weight: 600;">{{'uploadcertificate.chooseFile' | translate}}</span>
               </label>
-              </div>  
-              <div class="files-list">
+              </div>
+              <mat-error class="file-upload-error" id="fileInputError" *ngIf="uploadForm.controls.fileName.touched && uploadForm.controls.fileName.hasError('required')">{{ 'bulkUpload.validationMessages.file.required' | translate }}</mat-error>
+              <div class="files-list" aria-live="polite">
               <div class="single-file" *ngIf="uploadForm.controls.fileName.value">
                 <div class="file-icon" style="width: 50px">
-                  <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                  <svg version="1.1" id="Capa_1" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 58 58"
                     style="enable-background:new 0 0 58 58;" xml:space="preserve">
                     <polygon style="fill:#EDEADA;" points="51.5,14 37.5,0 6.5,0 6.5,58 51.5,58 " />

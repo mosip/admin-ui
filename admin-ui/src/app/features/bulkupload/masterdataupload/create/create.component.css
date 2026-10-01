@@ -158,3 +158,42 @@
     margin-left: 8px;
     color: rgba(0, 0, 0, 0.54);
   }
+
+  /* Master data upload form: keep the file section aligned with the form fields above */
+  .masterdata-upload-form .labelfileupload {
+    display: block;
+    margin-left: 10px;
+    margin-top: 8px;
+  }
+
+  .masterdata-upload-form .fileuploadcontainer,
+  .masterdata-upload-form .files-list .single-file {
+    margin-left: 10px;
+  }
+
+  /* On mobile, use the same horizontal span as the mat-form-fields above (100% width with 10px padding) */
+  @media (max-width: 600px) {
+    .masterdata-upload-form .fileuploadcontainer,
+    .masterdata-upload-form .files-list .single-file {
+      margin-right: 10px;
+      width: calc(100% - 20px);
+    }
+  }
+
+  /* File required error below the upload area */
+  .masterdata-upload-form .file-upload-error {
+    display: block;
+    margin-left: 10px;
+    margin-top: 6px;
+  }
+
+  /* Visible keyboard focus: the native file input is transparent, so outline its drop area instead */
+  .masterdata-upload-form .fileuploadcontainer:focus-within {
+    outline: 2px solid #FF4081;
+    outline-offset: 2px;
+  }
+
+  .masterdata-upload-form mat-label[role="button"]:focus {
+    outline: 2px solid #FF4081;
+    outline-offset: 2px;
+  }
