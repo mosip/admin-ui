@@ -180,6 +180,7 @@
     }
   }
 
+  /* File required error below the upload area */
   .masterdata-upload-form .file-upload-error {
     display: block;
     margin-left: 10px;
