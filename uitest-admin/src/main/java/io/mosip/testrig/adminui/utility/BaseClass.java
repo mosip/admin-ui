@@ -22,6 +22,7 @@ import com.aventstack.extentreports.ExtentTest;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.mosip.testrig.adminui.kernel.util.ConfigManager;
+import io.mosip.testrig.adminui.kernel.util.KernelAuthentication;
 import io.mosip.testrig.adminui.kernel.util.KeycloakUserManager;
 
 public class BaseClass {
@@ -68,17 +69,41 @@ public class BaseClass {
 					"--disable-dev-shm-usage");
 		}
 
+		if (isLocalPortal(envPath)) {
+			// Local UI (4200) calls local admin-service (8086). The auth adapter does not
+			// allow every header the UI sends, so Chrome blocks the call and the UI shows
+			// "No internet". Disable web security only for this local run.
+			// Each thread needs its own profile. A shared --user-data-dir makes Chrome
+			// fail to open localhost when tests run in parallel.
+			String profileDir = System.getProperty("java.io.tmpdir") + "admin-ui-chrome-"
+					+ Thread.currentThread().getId();
+			options.addArguments("--disable-web-security", "--user-data-dir=" + profileDir,
+					"--proxy-bypass-list=<-loopback>");
+			Map<String, Object> prefs = new HashMap<String, Object>();
+			prefs.put("profile.block_third_party_cookies", Boolean.FALSE);
+			prefs.put("profile.cookie_controls_mode", Integer.valueOf(0));
+			options.setExperimentalOption("prefs", prefs);
+		}
+
 		WebDriver threadDriver = new ChromeDriver(options);
 		driverThread.set(threadDriver); // Set driver for this thread
 
 		js = (JavascriptExecutor) driver();
 		vars = new HashMap<String, Object>();
+		driver().manage().window().maximize();
+		driver().manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
+
+		if (isLocalPortal(envPath)) {
+			injectAdminToken(threadDriver);
+			logger.info("Localhost run: opened portal with admin Authorization cookie. URL: " + envPath);
+			driver().get(envPath);
+			Commons.waitForPageLoad(driver());
+			return;
+		}
+
 		driver().get(envPath);
 		logger.info("Launch URL: " + envPath);
-		driver().manage().window().maximize();
 		Commons.waitForPageLoad(driver());
-		;
-		driver().manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
 
 		String language1 = ConfigManager.getloginlang();
 		String loginlang;
@@ -101,6 +126,57 @@ public class BaseClass {
 		Commons.enterSensitive(driver(), By.id("password"), password, "Entered password");
 		Commons.click(driver(), By.xpath("//input[@name='login']"), "Clicked login button");
 
+	}
+
+	/**
+	 * localhost is not in the auth-manager allowed redirect list, so the Keycloak
+	 * login page returns KER-ACP-009. Store the internal-auth token as a real
+	 * cookie on the API host. Forcing a Cookie header instead replaces every other
+	 * cookie, so later POST calls fail and the UI opens a Technical Error dialog
+	 * for each one.
+	 */
+	private void injectAdminToken(WebDriver threadDriver) {
+		if (BaseTestCaseFunc.ApplnURI == null || BaseTestCaseFunc.ApplnURI.isEmpty()) {
+			BaseTestCaseFunc.ApplnURI = ConfigManager.getiam_apiinternalendpoint();
+		}
+		String token = new KernelAuthentication().getAuthForAdmin();
+		if (token == null || token.isEmpty()) {
+			throw new IllegalStateException("Admin token was empty. Check Kernel.properties client id and secret.");
+		}
+		String apiUrl = cookieHost();
+		boolean https = apiUrl.startsWith("https://");
+		Map<String, Object> cookie = new HashMap<String, Object>();
+		cookie.put("name", BaseTestCaseFunc.COOKIENAME);
+		cookie.put("value", token);
+		cookie.put("url", apiUrl);
+		cookie.put("path", "/");
+		cookie.put("secure", Boolean.valueOf(https));
+		cookie.put("sameSite", https ? "None" : "Lax");
+		ChromeDriver chromeDriver = (ChromeDriver) threadDriver;
+		chromeDriver.executeCdpCommand("Network.enable", new HashMap<String, Object>());
+		chromeDriver.executeCdpCommand("Network.setCookie", cookie);
+		logger.info("Stored Authorization cookie for " + apiUrl);
+	}
+
+	/**
+	 * The UI calls masterdatabaseurl (local admin-service). A cookie stored on the
+	 * dev2 API host is not sent with those requests.
+	 */
+	private String cookieHost() {
+		String master = ConfigManager.getMasterdatabaseurl();
+		String host = (master != null && !master.isEmpty()) ? master : BaseTestCaseFunc.ApplnURI;
+		if (!host.endsWith("/")) {
+			host = host + "/";
+		}
+		return host;
+	}
+
+	private boolean isLocalPortal(String portalUrl) {
+		if (portalUrl == null) {
+			return false;
+		}
+		String url = portalUrl.toLowerCase();
+		return url.contains("localhost") || url.contains("127.0.0.1");
 	}
 
 	@AfterMethod(alwaysRun = true)

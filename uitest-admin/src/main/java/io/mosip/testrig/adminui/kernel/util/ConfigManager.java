@@ -3,9 +3,14 @@ package io.mosip.testrig.adminui.kernel.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.security.SecureRandom;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
@@ -93,6 +98,7 @@ public class ConfigManager {
 	private static String IAM_ADMINPORTAL_PATH = "adminPortalPath";
 	private static String IAM_APIENVUSER = "apiEnvUser";
 	private static String IAM_APIINTERNALENDPOINT = "apiInternalEndPoint";
+	private static String MASTER_DATA_BASE_URL = "masterdatabaseurl";
 	private static String IAM_REALM_ID = "keycloak-realm-id";
 	private static String IAM_USERS_TO_CREATE = "iam-users-to-create";
 	private static String IAM_USERS_PASSWORD = "iam-users-password";
@@ -217,6 +223,7 @@ public class ConfigManager {
 	private static String iam_adminportal_path;
 	private static String iam_apienvuser;
 	private static String iam_apiinternalendpoint;
+	private static String masterdatabaseurl;
 	private static String iam_realm_id;
 	private static String iam_users_to_create;
 	private static String iam_users_password;
@@ -288,6 +295,10 @@ public class ConfigManager {
 				? propsKernel.getProperty(IAM_APIINTERNALENDPOINT)
 				: System.getenv(IAM_APIINTERNALENDPOINT);
 		logger.info("apiinternalendpoint from config manager::" + iam_apiinternalendpoint);
+		masterdatabaseurl = System.getenv(MASTER_DATA_BASE_URL) == null
+				? propsKernel.getProperty(MASTER_DATA_BASE_URL)
+				: System.getenv(MASTER_DATA_BASE_URL);
+		logger.info("masterdatabaseurl from config manager::" + masterdatabaseurl);
 		
 		serviceNotDeployedList = System.getenv(SERVICES_NOT_DEPLOYED) == null
 				? propsKernel.getProperty(SERVICES_NOT_DEPLOYED)
@@ -308,10 +319,11 @@ public class ConfigManager {
 		
 		push_reports_to_s3 =System.getenv(PUSH_TO_S3) == null ? propsKernel.getProperty(PUSH_TO_S3) : System.getenv(PUSH_TO_S3);
 		propsKernel.setProperty(PUSH_TO_S3, push_reports_to_s3);
-		holidayDateCenter =System.getenv(HolidayDateCenter) == null ? propsKernel.getProperty(HolidayDateCenter) : System.getenv(HolidayDateCenter);
+		Set<String> usedDates = new HashSet<>();
+		holidayDateCenter = randomFutureDate(usedDates);
 		propsKernel.setProperty(HolidayDateCenter, holidayDateCenter);
 		
-		holidayDate =System.getenv(HolidayDate) == null ? propsKernel.getProperty(HolidayDate) : System.getenv(HolidayDate);
+		holidayDate = randomFutureDate(usedDates);
 		propsKernel.setProperty(HolidayDate, holidayDate);
 		
 		preappend =System.getenv(Preappend) == null ? propsKernel.getProperty(Preappend) : System.getenv(Preappend);
@@ -328,11 +340,13 @@ public class ConfigManager {
 		
 		
 		
-		dummyData =System.getenv(DummyData) == null ? propsKernel.getProperty(DummyData) : System.getenv(DummyData);
+		dummyData = randomLetters(11);
 		propsKernel.setProperty(DummyData, dummyData);
 		
-		validityDate =System.getenv(ValidityDate) == null ? propsKernel.getProperty(ValidityDate) : System.getenv(ValidityDate);
+		validityDate = randomFutureDate(usedDates);
 		propsKernel.setProperty(ValidityDate, validityDate);
+		logger.info("Generated test data holidayDateCenter=" + holidayDateCenter + " holidayDate=" + holidayDate
+				+ " validityDate=" + validityDate + " dummyData=" + dummyData);
 		
 		publicKey =System.getenv(PublicKey) == null ? propsKernel.getProperty(PublicKey) : System.getenv(PublicKey);
 		propsKernel.setProperty(PublicKey, publicKey);
@@ -356,6 +370,26 @@ public class ConfigManager {
 		propsKernel.setProperty(Testcases, testcases);
 
 	}
+	private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
+	private static String randomLetters(int length) {
+		StringBuilder word = new StringBuilder(length);
+		for (int i = 0; i < length; i++) {
+			word.append((char) ('a' + SECURE_RANDOM.nextInt(26)));
+		}
+		return word.toString();
+	}
+
+	private static String randomFutureDate(Set<String> usedDates) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+		String formatted;
+		do {
+			int plusDays = 1 + SECURE_RANDOM.nextInt(699);
+			formatted = LocalDate.now().plusDays(plusDays).format(formatter);
+		} while (!usedDates.add(formatted));
+		return formatted;
+	}
+
 	public static String gettestcases() {
 		return testcases;
 	}
@@ -669,6 +703,10 @@ public class ConfigManager {
 	}
 	public static String getiam_apiinternalendpoint() {
 		return iam_apiinternalendpoint;
+	}
+
+	public static String getMasterdatabaseurl() {
+		return masterdatabaseurl;
 	}
 //	public static String getAuthDemoServiceUrl() {
 //		return ConfigManager.getAuthDemoServiceBaseUrl() + ":" + ConfigManager.getAuthDemoServicePort();
